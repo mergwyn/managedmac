@@ -148,12 +148,12 @@ class managedmac::softwareupdate (
     'AutoUpdateRestartRequired' => $auto_update_restart_required,
   }
 
-  $autoupdate_plist_path = $macosx_productversion_major ? {
+  $autoupdate_plist_path = $::macosx_productversion_major ? {
     '10.9'  => '/Library/Preferences/com.apple.storeagent.plist',
     default => '/Library/Preferences/com.apple.commerce.plist',
   }
 
-  $autoupdate_plist_content = $macosx_productversion_major ? {
+  $autoupdate_plist_content = $::macosx_productversion_major ? {
     '10.9'  => $store_plist_content,
     default => $commerce_plist_content,
   }

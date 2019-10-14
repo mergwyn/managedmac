@@ -50,32 +50,29 @@ module CFPropertyList
   # interface class for PList parsers
   class ParserInterface
     # load a plist
-    def load(opts={})
-      return ""
+    def load(_opts = {})
+      ''
     end
 
     # convert a plist to string
-    def to_str(opts={})
-      return true
+    def to_str(_opts = {})
+      true
     end
   end
 
   class XMLParserInterface < ParserInterface
-    def new_node(name)
-    end
+    def new_node(name); end
 
-    def new_text(val)
-    end
+    def new_text(val); end
 
-    def append_node(parent, child)
-    end
+    def append_node(parent, child); end
   end
 end
 
 class String
-  unless("".respond_to?(:bytesize)) then
+  unless ''.respond_to?(:bytesize)
     def bytesize
-      self.length
+      length
     end
   end
 end
@@ -85,7 +82,7 @@ require dirname + '/rbCFPlistError.rb'
 require dirname + '/rbCFTypes.rb'
 require dirname + '/rbBinaryCFPropertyList.rb'
 
-require 'iconv' unless "".respond_to?("encode")
+require 'iconv' unless ''.respond_to?('encode')
 
 # ensure that the module and class exist
 module Enumerable
@@ -102,7 +99,7 @@ rescue LoadError, NameError
   try_nokogiri = true
 end
 
-if try_nokogiri then
+if try_nokogiri
   begin
     require dirname + '/rbNokogiriParser.rb'
     CFPropertyList.xml_parser_interface = CFPropertyList::NokogiriXMLParser
@@ -111,7 +108,6 @@ if try_nokogiri then
     CFPropertyList.xml_parser_interface = CFPropertyList::ReXMLParser
   end
 end
-
 
 module CFPropertyList
   # Create CFType hierarchy by guessing the correct CFType, e.g.
@@ -128,7 +124,7 @@ module CFPropertyList
   #  cftypes = CFPropertyList.guess(x,:convert_unknown_to_string => true,:converter_method => :to_hash, :converter_with_opts => true)
   def guess(object, options = {})
     case object
-    when Fixnum, Integer       then CFInteger.new(object)
+    when Integer, Integer then CFInteger.new(object)
     when Float                 then CFReal.new(object)
     when TrueClass, FalseClass then CFBoolean.new(object)
 
@@ -138,67 +134,64 @@ module CFPropertyList
     when String
       CFString.new(object)
 
-    when Time, DateTime, Date  then CFDate.new(object)
+    when Time, DateTime, Date then CFDate.new(object)
 
     when Array, Enumerator, Enumerable::Enumerator
-      ary = Array.new
+      ary = []
       object.each do |o|
         ary.push CFPropertyList.guess(o, options)
       end
       CFArray.new(ary)
 
     when Hash
-      hsh = Hash.new
-      object.each_pair do |k,v|
+      hsh = {}
+      object.each_pair do |k, v|
         k = k.to_s if k.is_a?(Symbol)
         hsh[k] = CFPropertyList.guess(v, options)
       end
       CFDictionary.new(hsh)
     else
-      case
-      when Object.const_defined?('BigDecimal') && object.is_a?(BigDecimal)
+      if Object.const_defined?('BigDecimal') && object.is_a?(BigDecimal)
         CFReal.new(object)
-      when object.respond_to?(:read)
+      elsif object.respond_to?(:read)
         raw_data = object.read
         # treat the data as a bytestring (ASCII-8BIT) if Ruby supports it.  Do this by forcing
         # the encoding, on the assumption that the bytes were read correctly, and just tagged with
         # an inappropriate encoding, rather than transcoding.
         raw_data.force_encoding(Encoding::ASCII_8BIT) if raw_data.respond_to?(:force_encoding)
         CFData.new(raw_data, CFData::DATA_RAW)
-      when options[:converter_method] && object.respond_to?(options[:converter_method])
+      elsif options[:converter_method] && object.respond_to?(options[:converter_method])
         if options[:converter_with_opts]
-          CFPropertyList.guess(object.send(options[:converter_method],options),options)
+          CFPropertyList.guess(object.send(options[:converter_method], options), options)
         else
-          CFPropertyList.guess(object.send(options[:converter_method]),options)
+          CFPropertyList.guess(object.send(options[:converter_method]), options)
         end
-      when options[:convert_unknown_to_string]
+      elsif options[:convert_unknown_to_string]
         CFString.new(object.to_s)
       else
-        raise CFTypeError.new("Unknown class #{object.class.to_s}. Try using :convert_unknown_to_string if you want to use unknown object types!")
+        raise CFTypeError, "Unknown class #{object.class}. Try using :convert_unknown_to_string if you want to use unknown object types!"
       end
     end
   end
 
   # Converts a CFType hiercharchy to native Ruby types
-  def native_types(object,keys_as_symbols=false)
+  def native_types(object, keys_as_symbols = false)
     return if object.nil?
 
-    if(object.is_a?(CFDate) || object.is_a?(CFString) || object.is_a?(CFInteger) || object.is_a?(CFReal) || object.is_a?(CFBoolean)) then
+    if object.is_a?(CFDate) || object.is_a?(CFString) || object.is_a?(CFInteger) || object.is_a?(CFReal) || object.is_a?(CFBoolean)
       return object.value
-    elsif(object.is_a?(CFData)) then
+    elsif object.is_a?(CFData)
       return CFPropertyList::Blob.new(object.decoded_value)
-    elsif(object.is_a?(CFArray)) then
+    elsif object.is_a?(CFArray)
       ary = []
-      object.value.each do
-        |v|
+      object.value.each do |v|
         ary.push CFPropertyList.native_types(v)
       end
 
       return ary
-    elsif(object.is_a?(CFDictionary)) then
+    elsif object.is_a?(CFDictionary)
       hsh = {}
-      object.value.each_pair do
-        |k,v|
+      object.value.each_pair do |k, v|
         k = k.to_sym if keys_as_symbols
         hsh[k] = CFPropertyList.native_types(v)
       end
@@ -238,7 +231,7 @@ module CFPropertyList
     # :data:: Parse a string
     #
     # All arguments are optional
-    def initialize(opts={})
+    def initialize(opts = {})
       @filename = opts[:file]
       @format = opts[:format] || FORMAT_AUTO
       @data = opts[:data]
@@ -260,48 +253,48 @@ module CFPropertyList
 
     # Load an XML PropertyList
     # filename = nil:: The filename to read from; if nil, read from the file defined by instance variable +filename+
-    def load_xml(filename=nil)
-      load(filename,List::FORMAT_XML)
+    def load_xml(filename = nil)
+      load(filename, List::FORMAT_XML)
     end
 
     # read a binary plist file
     # filename = nil:: The filename to read from; if nil, read from the file defined by instance variable +filename+
-    def load_binary(filename=nil)
-      load(filename,List::FORMAT_BINARY)
+    def load_binary(filename = nil)
+      load(filename, List::FORMAT_BINARY)
     end
 
     # load a plist from a XML string
     # str:: The string containing the plist
-    def load_xml_str(str=nil)
-      load_str(str,List::FORMAT_XML)
+    def load_xml_str(str = nil)
+      load_str(str, List::FORMAT_XML)
     end
 
     # load a plist from a binary string
     # str:: The string containing the plist
-    def load_binary_str(str=nil)
-      load_str(str,List::FORMAT_BINARY)
+    def load_binary_str(str = nil)
+      load_str(str, List::FORMAT_BINARY)
     end
 
     # load a plist from a string
     # str = nil:: The string containing the plist
     # format = nil:: The format of the plist
-    def load_str(str=nil,format=nil)
+    def load_str(str = nil, format = nil)
       str = @data if str.nil?
       format = @format if format.nil?
 
       @value = {}
       case format
       when List::FORMAT_BINARY, List::FORMAT_XML then
-        prsr = @@parsers[format-1].new
-        @value = prsr.load({:data => str})
+        prsr = @@parsers[format - 1].new
+        @value = prsr.load(data: str)
 
       when List::FORMAT_AUTO then # what we now do is ugly, but neccessary to recognize the file format
         filetype = str[0..5]
         version = str[6..7]
 
         prsr = nil
-        if filetype == "bplist" then
-          raise CFFormatError.new("Wrong file version #{version}") unless version == "00"
+        if filetype == 'bplist'
+          raise CFFormatError, "Wrong file version #{version}" unless version == '00'
           prsr = Binary.new
           @format = List::FORMAT_BINARY
         else
@@ -309,34 +302,34 @@ module CFPropertyList
           @format = List::FORMAT_XML
         end
 
-        @value = prsr.load({:data => str})
+        @value = prsr.load(data: str)
       end
     end
 
     # Read a plist file
     # file = nil:: The filename of the file to read. If nil, use +filename+ instance variable
     # format = nil:: The format of the plist file. Auto-detect if nil
-    def load(file=nil,format=nil)
+    def load(file = nil, format = nil)
       file = @filename if file.nil?
       format = @format if format.nil?
       @value = {}
 
-      raise IOError.new("File #{file} not readable!") unless File.readable? file
+      raise IOError, "File #{file} not readable!" unless File.readable? file
 
       case format
       when List::FORMAT_BINARY, List::FORMAT_XML then
-        prsr = @@parsers[format-1].new
-        @value = prsr.load({:file => file})
+        prsr = @@parsers[format - 1].new
+        @value = prsr.load(file: file)
 
       when List::FORMAT_AUTO then # what we now do is ugly, but neccessary to recognize the file format
-        magic_number = IO.read(file,8)
-        raise IOError.new("File #{file} is empty.") unless magic_number
+        magic_number = IO.read(file, 8)
+        raise IOError, "File #{file} is empty." unless magic_number
         filetype = magic_number[0..5]
         version = magic_number[6..7]
 
         prsr = nil
-        if filetype == "bplist" then
-          raise CFFormatError.new("Wong file version #{version}") unless version == "00"
+        if filetype == 'bplist'
+          raise CFFormatError, "Wong file version #{version}" unless version == '00'
           prsr = Binary.new
           @format = List::FORMAT_BINARY
         else
@@ -344,60 +337,58 @@ module CFPropertyList
           @format = List::FORMAT_XML
         end
 
-        @value = prsr.load({:file => file})
+        @value = prsr.load(file: file)
       end
 
-      raise CFFormatError.new("Invalid format or parser error!") if @value.nil?
+      raise CFFormatError, 'Invalid format or parser error!' if @value.nil?
     end
 
     # Serialize CFPropertyList object to specified format and write it to file
     # file = nil:: The filename of the file to write to. Uses +filename+ instance variable if nil
     # format = nil:: The format to save in. Uses +format+ instance variable if nil
-    def save(file=nil,format=nil,opts={})
+    def save(file = nil, format = nil, opts = {})
       format = @format if format.nil?
       file = @filename if file.nil?
 
-      raise CFFormatError.new("Format #{format} not supported, use List::FORMAT_BINARY or List::FORMAT_XML") if format != FORMAT_BINARY && format != FORMAT_XML
+      raise CFFormatError, "Format #{format} not supported, use List::FORMAT_BINARY or List::FORMAT_XML" if format != FORMAT_BINARY && format != FORMAT_XML
 
-      if(!File.exists?(file)) then
-        raise IOError.new("File #{file} not writable!") unless File.writable?(File.dirname(file))
-      elsif(!File.writable?(file)) then
-        raise IOError.new("File #{file} not writable!")
+      if !File.exist?(file)
+        raise IOError, "File #{file} not writable!" unless File.writable?(File.dirname(file))
+      elsif !File.writable?(file)
+        raise IOError, "File #{file} not writable!"
       end
 
       opts[:root] = @value
-      opts[:formatted] = @formatted unless opts.has_key?(:formatted)
+      opts[:formatted] = @formatted unless opts.key?(:formatted)
 
-      prsr = @@parsers[format-1].new
+      prsr = @@parsers[format - 1].new
 
       content = prsr.to_str(opts)
 
-      File.open(file, 'wb') {
-        |fd|
+      File.open(file, 'wb') do |fd|
         fd.write content
-      }
+      end
     end
 
     # convert plist to string
     # format = List::FORMAT_BINARY:: The format to save the plist
     # opts={}:: Pass parser options
-    def to_str(format=List::FORMAT_BINARY,opts={})
-      raise CFFormatError.new("Format #{format} not supported, use List::FORMAT_BINARY or List::FORMAT_XML") if format != FORMAT_BINARY && format != FORMAT_XML
+    def to_str(format = List::FORMAT_BINARY, opts = {})
+      raise CFFormatError, "Format #{format} not supported, use List::FORMAT_BINARY or List::FORMAT_XML" if format != FORMAT_BINARY && format != FORMAT_XML
 
-      prsr = @@parsers[format-1].new
+      prsr = @@parsers[format - 1].new
 
       opts[:root] = @value
-      opts[:formatted] = @formatted unless opts.has_key?(:formatted)
+      opts[:formatted] = @formatted unless opts.key?(:formatted)
 
-      return prsr.to_str(opts)
+      prsr.to_str(opts)
     end
   end
 end
 
-
 class Array
   # convert an array to plist format
-  def to_plist(options={})
+  def to_plist(options = {})
     options[:plist_format] ||= CFPropertyList::List::FORMAT_BINARY
 
     plist = CFPropertyList::List.new
@@ -408,7 +399,7 @@ end
 
 class Enumerator
   # convert an array to plist format
-  def to_plist(options={})
+  def to_plist(options = {})
     options[:plist_format] ||= CFPropertyList::List::FORMAT_BINARY
 
     plist = CFPropertyList::List.new
@@ -419,7 +410,7 @@ end
 
 class Hash
   # convert a hash to plist format
-  def to_plist(options={})
+  def to_plist(options = {})
     options[:plist_format] ||= CFPropertyList::List::FORMAT_BINARY
 
     plist = CFPropertyList::List.new

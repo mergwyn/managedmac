@@ -1,0 +1,17 @@
+---
+appveyor.yml:
+  delete: true
+.gitlab-ci.yml:
+  delete: true
+.vscode/extensions.json:
+  delete: true
+.travis.yml:
+  notifications:
+    email:
+      recipients:
+      on_success: change # default: change
+      on_failure: always # default: always
+Rakefile:
+  default_disabled_lint_checks:
+    - 'relative'
+    - 'variable_is_lowercase'

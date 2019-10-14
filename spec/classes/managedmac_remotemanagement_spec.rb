@@ -1,39 +1,40 @@
 require 'spec_helper'
 
-describe 'managedmac::remotemanagement', :type => 'class' do
-
-  context "when none of the params is set" do
+describe 'managedmac::remotemanagement', type: 'class' do
+  context 'when none of the params is set' do
     it do
-      should_not contain_remotemanagement('apple_remote_desktop')
+      is_expected.not_to contain_remotemanagement('apple_remote_desktop')
     end
   end
 
-  context "when passed a BAD param" do
+  context 'when passed a BAD param' do
     let(:params) do
       {
-        :enable => true,
-        :allow_all_users => 'a string',
+        enable: true,
+        allow_all_users: 'a string',
       }
     end
-    it { should raise_error(Puppet::Error, /not a boolean/) }
+
+    it { is_expected.to raise_error(Puppet::Error, %r{not a boolean}) }
   end
 
-  context "when $enable == false" do
+  context 'when $enable == false' do
     let(:params) do
-      { :enable => false }
+      { enable: false }
     end
+
     it do
-      should contain_remotemanagement('apple_remote_desktop').with_ensure('stopped')
+      is_expected.to contain_remotemanagement('apple_remote_desktop').with_ensure('stopped')
     end
   end
 
-  context "when $enable == true" do
+  context 'when $enable == true' do
     let(:params) do
-      { :enable => true  }
+      { enable: true }
     end
+
     it do
-      should contain_remotemanagement('apple_remote_desktop').with_ensure('running')
+      is_expected.to contain_remotemanagement('apple_remote_desktop').with_ensure('running')
     end
   end
-
 end

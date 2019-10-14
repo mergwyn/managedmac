@@ -1,55 +1,59 @@
 require 'spec_helper'
 
-describe 'managedmac::energysaver', :type => 'class' do
-
-  context "when $desktop is not a Hash" do
+describe 'managedmac::energysaver', type: 'class' do
+  context 'when $desktop is not a Hash' do
     let(:params) do
-      { :desktop => "Icanhazstring", }
+      { desktop: 'Icanhazstring' }
     end
-    it { should raise_error(Puppet::Error) }
+
+    it { is_expected.to raise_error(Puppet::Error) }
   end
 
-  context "when $portable is not a Hash" do
+  context 'when $portable is not a Hash' do
     let(:params) do
-      { :desktop => "Icanhazstring", }
+      { desktop: 'Icanhazstring' }
     end
-    it { should raise_error(Puppet::Error) }
+
+    it { is_expected.to raise_error(Puppet::Error) }
   end
 
-  context "when $desktop is an empty Hash" do
+  context 'when $desktop is an empty Hash' do
     let(:params) do
-      { :desktop => {}, }
+      { desktop: {} }
     end
+
     it do
-      should contain_mobileconfig('managedmac.energysaver.alacarte').with_ensure('absent')
+      is_expected.to contain_mobileconfig('managedmac.energysaver.alacarte').with_ensure('absent')
     end
   end
 
-  context "when $portable is an empty Hash" do
+  context 'when $portable is an empty Hash' do
     let(:params) do
-      { :portable => {}, }
+      { portable: {} }
     end
+
     it do
-      should contain_mobileconfig('managedmac.energysaver.alacarte').with_ensure('absent')
+      is_expected.to contain_mobileconfig('managedmac.energysaver.alacarte').with_ensure('absent')
     end
   end
 
-  context "when $desktop is NOT an empty Hash" do
+  context 'when $desktop is NOT an empty Hash' do
     let(:params) do
-      { :desktop => options_energysaver['desktop'], }
+      { desktop: options_energysaver['desktop'] }
     end
+
     it do
-      should contain_mobileconfig('managedmac.energysaver.alacarte').with_ensure('present')
+      is_expected.to contain_mobileconfig('managedmac.energysaver.alacarte').with_ensure('present')
     end
   end
 
-  context "when $portable is NOT an empty Hash" do
+  context 'when $portable is NOT an empty Hash' do
     let(:params) do
-      { :portable => options_energysaver['portable'], }
+      { portable: options_energysaver['portable'] }
     end
+
     it do
-      should contain_mobileconfig('managedmac.energysaver.alacarte').with_ensure('present')
+      is_expected.to contain_mobileconfig('managedmac.energysaver.alacarte').with_ensure('present')
     end
   end
-
 end

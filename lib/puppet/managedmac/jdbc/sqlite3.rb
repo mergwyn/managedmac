@@ -1,9 +1,12 @@
-warn "Jdbc-SQLite3 is only for use with JRuby" if (JRUBY_VERSION.nil? rescue true)
+warn 'Jdbc-SQLite3 is only for use with JRuby' if begin
+                                                     JRUBY_VERSION.nil?
+                                                   rescue
+                                                     true
+                                                   end
 require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'managedmac', 'jdbc', 'sqlite3', 'version'))
 
 module Jdbc
   module SQLite3
-
     def self.driver_jar
       "sqlite-jdbc-#{DRIVER_VERSION}.jar"
     end
@@ -17,8 +20,8 @@ module Jdbc
     end
 
     if defined?(JRUBY_VERSION) && # enable backwards-compat behavior :
-      ( Java::JavaLang::Boolean.get_boolean("jdbc.driver.autoload") ||
-        Java::JavaLang::Boolean.get_boolean("jdbc.sqlite3.autoload") )
+       (Java::JavaLang::Boolean.get_boolean('jdbc.driver.autoload') ||
+         Java::JavaLang::Boolean.get_boolean('jdbc.sqlite3.autoload'))
       warn "autoloading JDBC driver on require 'jdbc/sqlite3'" if $VERBOSE
       load_driver :require
     end

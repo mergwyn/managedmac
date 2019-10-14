@@ -1,7 +1,7 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'managedmac', 'common'))
 
 Puppet::Type.newtype(:macgroup) do
-  @doc = %q{A drop-in replacement for the built-in Puppet Type: Group
+  @doc = %q(A drop-in replacement for the built-in Puppet Type: Group
 
     A custom Puppet type for configuring and managing OS X groups.
 
@@ -22,15 +22,15 @@ Puppet::Type.newtype(:macgroup) do
       strict => true,
     }
 
-  }
+  )
 
   ensurable
 
   newparam(:name) do
-    desc %q{The resource name.
+    desc 'The resource name.
 
     Corresponds to the RecordName/name attribute.
-    }
+    '
     isnamevar
 
     # Override #insync?
@@ -44,7 +44,7 @@ Puppet::Type.newtype(:macgroup) do
   end
 
   newproperty(:gid) do
-    desc %q{The numeric ID for the Group.
+    desc 'The numeric ID for the Group.
 
       Corresponds to the PrimaryGroupID/gid attribute.
 
@@ -60,8 +60,8 @@ Puppet::Type.newtype(:macgroup) do
       especially built-ins.
 
       Default is :absent.
-    }
-    newvalues(/^\d+$/)
+    '
+    newvalues(%r{^\d+$})
 
     def insync?(is)
       i, s = [is, should].map do |a|
@@ -76,8 +76,8 @@ Puppet::Type.newtype(:macgroup) do
     end
   end
 
-  newproperty(:users, :array_matching => :all) do
-    desc %q{The list of users you want added to the group.
+  newproperty(:users, array_matching: :all) do
+    desc "The list of users you want added to the group.
 
       Corresponds to the GroupMembership/users attribute.
 
@@ -96,18 +96,19 @@ Puppet::Type.newtype(:macgroup) do
       and will create and empty list... Use caution.
 
       Default is :absent (no management)
-    }
+    "
     # Validate a user account parameter
     def validate_user(name)
-      result = ::ManagedMacCommon::dscl_find_by(:users, 'name', name)
+      result = ::ManagedMacCommon.dscl_find_by(:users, 'name', name)
       unless result.respond_to? :first
         raise Puppet::Error,
-           "An unknown error occured while searching: #{result}"
+              "An unknown error occured while searching: #{result}"
       end
 
       if result.empty?
         Puppet::Util::Warnings.warnonce(
-          "Macgroup: User not found: \'#{name}\'")
+          "Macgroup: User not found: \'#{name}\'",
+        )
       end
 
       name
@@ -117,7 +118,7 @@ Puppet::Type.newtype(:macgroup) do
     # - We need to sort the Arrays before performing an equality test.
     # - We also need to obey the :strict param and compare the Arrays appropriately
     def insync?(is)
-      i, s = [is, should].collect do |a|
+      i, s = [is, should].map do |a|
         if a == :absent
           []
         else
@@ -136,7 +137,7 @@ Puppet::Type.newtype(:macgroup) do
     end
   end
 
-  newproperty(:nestedgroups, :array_matching => :all) do
+  newproperty(:nestedgroups, array_matching: :all) do
     desc %q{A list of groups you want nested inside the group.
 
       Corresponds to the NestedGroups/nestedgroups attribute.
@@ -178,20 +179,21 @@ Puppet::Type.newtype(:macgroup) do
     # Resolve a group name to uuid in OpenDirectory
     # - given a valid name value, return the GeneratedUID for the group
     def group_to_uuid(name)
-      result = ::ManagedMacCommon::dscl_find_by(:groups, 'name', name)
+      result = ::ManagedMacCommon.dscl_find_by(:groups, 'name', name)
       unless result.respond_to? :first
         raise Puppet::Error,
-           "An unknown error occured while searching: #{result}"
+              "An unknown error occured while searching: #{result}"
       end
 
       if result.empty?
         Puppet::Util::Warnings.warnonce(
-          "Macgroup: Group not found: \'#{name}\'")
+          "Macgroup: Group not found: \'#{name}\'",
+        )
         return nil
       end
 
       cmd_args = [::ManagedMacCommon::DSCL, ::ManagedMacCommon::SEARCH_NODE,
-        'read', "/Groups/\'#{name}\'", 'GeneratedUID']
+                  'read', "/Groups/\'#{name}\'", 'GeneratedUID']
 
       `#{cmd_args.join(' ')}`.chomp.split.last.strip
     end
@@ -201,15 +203,16 @@ Puppet::Type.newtype(:macgroup) do
     # - generates a warning if the uuid cannot be resovled
     # - always returns the GeneratedUID (input)
     def uuid_to_group(uuid)
-      result = ::ManagedMacCommon::dscl_find_by(:groups, 'GeneratedUID', uuid)
+      result = ::ManagedMacCommon.dscl_find_by(:groups, 'GeneratedUID', uuid)
       unless result.respond_to? :first
         raise Puppet::Error,
-           "An unknown error occurred while searching: #{result}"
+              "An unknown error occurred while searching: #{result}"
       end
 
       if result.empty?
         Puppet::Util::Warnings.warnonce(
-          "Macgroup: Group not found: \'#{uuid}\'")
+          "Macgroup: Group not found: \'#{uuid}\'",
+        )
       end
 
       uuid
@@ -219,7 +222,7 @@ Puppet::Type.newtype(:macgroup) do
     # - We need to sort the Arrays before performing an equality test.
     # - We also need to obey the :strict param and compare the Arrays appropriately
     def insync?(is)
-      i, s = [is, should].collect do |a|
+      i, s = [is, should].map do |a|
         if a == :absent
           []
         else
@@ -235,7 +238,7 @@ Puppet::Type.newtype(:macgroup) do
     # Normalize the should parameter
     munge do |value|
       guid = '\A[0-9A-Z]{8}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{12}\z'
-      if value =~ /#{guid}/
+      if value =~ %r{#{guid}}
         uuid_to_group(value)
       else
         group_to_uuid(value)
@@ -244,7 +247,7 @@ Puppet::Type.newtype(:macgroup) do
   end
 
   newparam(:strict) do
-    desc %q{How to handle membership in the users and nestedgroups arrays.
+    desc "How to handle membership in the users and nestedgroups arrays.
 
       A Boolean value that informs the provider whether to merge the
       specified members into the record, or replace them outright.
@@ -262,18 +265,18 @@ Puppet::Type.newtype(:macgroup) do
       To accomplish this, you can set the strict parameter to false.
 
       Default is :true (purge)
-    }
+    "
     newvalues(:true, :false)
     defaultto :true
   end
 
   newproperty(:realname) do
-    desc %q{Optional string value that declares the group's RealName.
+    desc "Optional string value that declares the group's RealName.
 
       Corresponds to the RealName/realname attribute.
 
       Default is :absent.
-    }
+    "
 
     def insync?(is)
       i, s = [is, should].each do |a|
@@ -290,12 +293,12 @@ Puppet::Type.newtype(:macgroup) do
   end
 
   newproperty(:comment) do
-    desc %q{String that describes the group's purpose.
+    desc "String that describes the group's purpose.
 
       Corresponds to the Comment/comment attribute.
 
       Default is :absent.
-    }
+    "
 
     def insync?(is)
       i, s = [is, should].each do |a|
@@ -310,5 +313,4 @@ Puppet::Type.newtype(:macgroup) do
       end
     end
   end
-
 end

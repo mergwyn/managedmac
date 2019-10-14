@@ -1,7 +1,7 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'managedmac', 'common'))
 
 Puppet::Type.newtype(:mobileconfig) do
-  @doc = %q{Dynamically create and manage OS X .mobileconfig profiles
+  @doc = "Dynamically create and manage OS X .mobileconfig profiles
 
   A custom Puppet type for delivering policy via OS X profiles.
 
@@ -54,7 +54,7 @@ Puppet::Type.newtype(:mobileconfig) do
 
   # Remove the profile using puppet resource...
   `sudo puppet resource mobileconfig puppetlabs.dock.alacarte ensure=absent`
-  }
+  "
 
   ensurable
 
@@ -62,7 +62,7 @@ Puppet::Type.newtype(:mobileconfig) do
     isnamevar
   end
 
-  newproperty(:content, :array_matching => :all) do
+  newproperty(:content, array_matching: :all) do
     desc "Array of Hashes containing the payload data for the profile.
     Each hash is a key/value store represnting the payload settings
     a given PayloadType.
@@ -124,8 +124,8 @@ Puppet::Type.newtype(:mobileconfig) do
       return false unless is.length == should.length
 
       # Shoehorn the MD5 sums
-      should.collect! do |hash|
-        hash[key] = ::ManagedMacCommon::content_to_uuid hash.sort
+      should.map! do |hash|
+        hash[key] = ::ManagedMacCommon.content_to_uuid hash.sort
         hash
       end
 
@@ -145,14 +145,13 @@ Puppet::Type.newtype(:mobileconfig) do
 
     # Normalize the :content array
     munge do |value|
-      value = ::ManagedMacCommon::destringify value
+      value = ::ManagedMacCommon.destringify value
       # Scrub keys
       ::ManagedMacCommon::FILTERED_PAYLOAD_KEYS.each do |key|
         value.delete_if { |k| k.eql?(key) }
       end
       value
     end
-
   end
 
   newproperty(:description) do
@@ -174,7 +173,7 @@ Puppet::Type.newtype(:mobileconfig) do
         raise ArgumentError, "Expected String, got #{value.class}"
       end
     end
-    defaultto { "Puppet Mobile Config: " + @resource[:name] }
+    defaultto { 'Puppet Mobile Config: ' + @resource[:name] }
   end
 
   newproperty(:organization) do
@@ -200,5 +199,4 @@ Puppet::Type.newtype(:mobileconfig) do
       is.to_sym == should.to_sym
     end
   end
-
 end

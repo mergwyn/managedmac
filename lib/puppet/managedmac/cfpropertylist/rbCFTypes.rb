@@ -23,12 +23,11 @@ module CFPropertyList
     # value of the type
     attr_accessor :value
 
-    def initialize(value=nil)
+    def initialize(value = nil)
       @value = value
     end
 
-    def to_xml(parser)
-    end
+    def to_xml(parser); end
 
     def to_binary(bplist) end
   end
@@ -45,7 +44,7 @@ module CFPropertyList
 
     # convert to binary
     def to_binary(bplist)
-      bplist.string_to_binary(@value);
+      bplist.string_to_binary(@value)
     end
   end
 
@@ -85,48 +84,53 @@ module CFPropertyList
   # geht the timestamp or the Apple timestamp
   class CFDate < CFType
     TIMESTAMP_APPLE = 0
-    TIMESTAMP_UNIX  = 1;
-    DATE_DIFF_APPLE_UNIX = 978307200
+    TIMESTAMP_UNIX  = 1
+    DATE_DIFF_APPLE_UNIX = 978_307_200
 
     # create a XML date strimg from a time object
-    def CFDate.date_string(val)
+    def self.date_string(val)
       # 2009-05-13T20:23:43Z
-      val.getutc.strftime("%Y-%m-%dT%H:%M:%SZ")
+      val.getutc.strftime('%Y-%m-%dT%H:%M:%SZ')
     end
 
     # parse a XML date string
-    def CFDate.parse_date(val)
+    def self.parse_date(val)
       # 2009-05-13T20:23:43Z
       val =~ %r{^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z$}
-      year,month,day,hour,min,sec = $1, $2, $3, $4, $5, $6
-      return Time.utc(year,month,day,hour,min,sec).getlocal
+      year = Regexp.last_match(1)
+      month = Regexp.last_match(2)
+      day = Regexp.last_match(3)
+      hour = Regexp.last_match(4)
+      min = Regexp.last_match(5)
+      sec = Regexp.last_match(6)
+      Time.utc(year, month, day, hour, min, sec).getlocal
     end
 
     # set value to defined state
-    def initialize(value = nil,format=CFDate::TIMESTAMP_UNIX)
-      if(value.is_a?(Time) || value.nil?) then
+    def initialize(value = nil, format = CFDate::TIMESTAMP_UNIX)
+      if value.is_a?(Time) || value.nil?
         @value = value.nil? ? Time.now : value
       elsif value.instance_of? Date
         @value = Time.utc(value.year, value.month, value.day, 0, 0, 0)
       elsif value.instance_of? DateTime
         @value = value.to_time.utc
       else
-        set_value(value,format)
+        set_value(value, format)
       end
     end
 
     # set value with timestamp, either Apple or UNIX
-    def set_value(value,format=CFDate::TIMESTAMP_UNIX)
-      if(format == CFDate::TIMESTAMP_UNIX) then
-        @value = Time.at(value)
-      else
-        @value = Time.at(value + CFDate::DATE_DIFF_APPLE_UNIX)
-      end
+    def set_value(value, format = CFDate::TIMESTAMP_UNIX)
+      @value = if format == CFDate::TIMESTAMP_UNIX
+                 Time.at(value)
+               else
+                 Time.at(value + CFDate::DATE_DIFF_APPLE_UNIX)
+               end
     end
 
     # get timestamp, either UNIX or Apple timestamp
-    def get_value(format=CFDate::TIMESTAMP_UNIX)
-      if(format == CFDate::TIMESTAMP_UNIX) then
+    def get_value(format = CFDate::TIMESTAMP_UNIX)
+      if format == CFDate::TIMESTAMP_UNIX
         @value.to_i
       else
         @value.to_f - CFDate::DATE_DIFF_APPLE_UNIX
@@ -136,7 +140,7 @@ module CFPropertyList
     # convert to XML
     def to_xml(parser)
       n = parser.new_node('date')
-      n = parser.append_node(n, parser.new_text(CFDate::date_string(@value)))
+      n = parser.append_node(n, parser.new_text(CFDate.date_string(@value)))
       n
     end
 
@@ -155,7 +159,7 @@ module CFPropertyList
 
     # convert to binary
     def to_binary(bplist)
-      bplist.bool_to_binary(@value);
+      bplist.bool_to_binary(@value)
     end
   end
 
@@ -167,8 +171,8 @@ module CFPropertyList
     DATA_RAW = 1
 
     # set value to defined state, either base64 encoded or raw
-    def initialize(value=nil,format=DATA_BASE64)
-      if(format == DATA_RAW)
+    def initialize(value = nil, format = DATA_BASE64)
+      if format == DATA_RAW
         @raw_value = value
       else
         @value = value
@@ -177,7 +181,7 @@ module CFPropertyList
 
     # get base64 encoded value
     def encoded_value
-      @value ||= "\n#{Base64.encode64(@raw_value).gsub("\n", '').scan(/.{1,76}/).join("\n")}\n"
+      @value ||= "\n#{Base64.encode64(@raw_value).delete("\n").scan(%r{.{1,76}}).join("\n")}\n"
     end
 
     # get base64 decoded value
@@ -188,20 +192,20 @@ module CFPropertyList
     # convert to XML
     def to_xml(parser)
       n = parser.new_node('data')
-      n = parser.append_node(n, parser.new_text(encoded_value()))
+      n = parser.append_node(n, parser.new_text(encoded_value))
       n
     end
 
     # convert to binary
     def to_binary(bplist)
-      bplist.data_to_binary(decoded_value())
+      bplist.data_to_binary(decoded_value)
     end
   end
 
   # This class contains an array of values
   class CFArray < CFType
     # create a new array CFType
-    def initialize(val=[])
+    def initialize(val = [])
       @value = val
     end
 
@@ -223,7 +227,7 @@ module CFPropertyList
   # this class contains a hash of values
   class CFDictionary < CFType
     # Create new CFDictonary type.
-    def initialize(value={})
+    def initialize(value = {})
       @value = value
     end
 

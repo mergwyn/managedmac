@@ -10,10 +10,9 @@ module CFPropertyList
     # * :file - The filename of the file to load
     # * :data - The data to parse
     def load(opts)
-
       doc = nil
-      if(opts.has_key?(:file)) then
-        File.open(opts[:file], "rb") { |fd| doc = REXML::Document.new(fd) }
+      if opts.key?(:file)
+        File.open(opts[:file], 'rb') { |fd| doc = REXML::Document.new(fd) }
       else
         doc = REXML::Document.new(opts[:data])
       end
@@ -23,37 +22,37 @@ module CFPropertyList
         return import_xml(root)
       end
     rescue REXML::ParseException => e
-      raise CFFormatError.new('invalid XML: ' + e.message)
+      raise CFFormatError, 'invalid XML: ' + e.message
     end
 
     # serialize CFPropertyList object to XML
     # opts = {}:: Specify options: :formatted - Use indention and line breaks
-    def to_str(opts={})
+    def to_str(opts = {})
       doc = REXML::Document.new
       @doc = doc
 
       doc.context[:attribute_quote] = :quote
 
-      doc.add_element 'plist', {'version' => '1.0'}
+      doc.add_element 'plist', 'version' => '1.0'
       doc.root << opts[:root].to_xml(self)
 
-      formatter = if opts[:formatted] then
-        f = REXML::Formatters::Pretty.new(2)
-        f.compact = true
-        f
-      else
-        REXML::Formatters::Default.new
+      formatter = if opts[:formatted]
+                    f = REXML::Formatters::Pretty.new(2)
+                    f.compact = true
+                    f
+                  else
+                    REXML::Formatters::Default.new
       end
 
-      str = formatter.write(doc.root, "")
+      str = formatter.write(doc.root, '')
       str1 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n" + str + "\n"
       str1.force_encoding('UTF-8') if str1.respond_to?(:force_encoding)
 
-      return str1
+      str1
     end
 
     def new_node(name)
-      #LibXML::XML::Node.new(name)
+      # LibXML::XML::Node.new(name)
       REXML::Element.new(name)
     end
 
@@ -62,7 +61,7 @@ module CFPropertyList
     end
 
     def append_node(parent, child)
-      if child.is_a?(String) then
+      if child.is_a?(String)
         parent.add_text child
       else
         parent.elements << child
@@ -86,19 +85,19 @@ module CFPropertyList
 
       case node.name
       when 'dict'
-        hsh = Hash.new
+        hsh = {}
         key = nil
 
-        if node.has_elements? then
+        if node.has_elements?
           node.elements.each do |n|
             next if n.name == '#text' # avoid a bug of libxml
             next if n.name == '#comment'
 
-            if n.name == "key" then
+            if n.name == 'key'
               key = get_value(n)
               key = '' if key.nil? # REXML returns nil if key is empty
             else
-              raise CFFormatError.new("Format error!") if key.nil?
+              raise CFFormatError, 'Format error!' if key.nil?
               hsh[key] = import_xml(n)
               key = nil
             end
@@ -108,9 +107,9 @@ module CFPropertyList
         ret = CFDictionary.new(hsh)
 
       when 'array'
-        ary = Array.new
+        ary = []
 
-        if node.has_elements? then
+        if node.has_elements?
           node.elements.each do |n|
             next if n.name == '#text' # avoid a bug of libxml
             ary.push import_xml(n)
@@ -136,7 +135,7 @@ module CFPropertyList
         ret = CFDate.new(CFDate.parse_date(get_value(node)))
       end
 
-      return ret
+      ret
     end
   end
 end

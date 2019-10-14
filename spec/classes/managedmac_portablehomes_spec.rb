@@ -1,163 +1,173 @@
 require 'spec_helper'
 
-describe "managedmac::portablehomes", :type => 'class' do
-
+describe 'managedmac::portablehomes', type: 'class' do
   context "product version doesn't matter when $enable is a BOOL" do
-
-    context "when product version is 10.9 and $enable == true" do
+    context 'when product version is 10.9 and $enable == true' do
       let :facts do
         {
-          :macosx_productversion_major => '10.9',
+          macosx_productversion_major: '10.9',
         }
       end
 
       let(:params) do
-        { :enable => true }
+        { enable: true }
       end
+
       it do
-        should contain_mobileconfig('managedmac.portablehomes.alacarte').with_ensure('present')
+        is_expected.to contain_mobileconfig('managedmac.portablehomes.alacarte').with_ensure('present')
       end
     end
 
-    context "when product version is 10.9 and $enable == false" do
+    context 'when product version is 10.9 and $enable == false' do
       let :facts do
         {
-          :macosx_productversion_major => '10.9',
+          macosx_productversion_major: '10.9',
         }
       end
 
       let(:params) do
-        { :enable => false }
+        { enable: false }
       end
+
       it do
-        should contain_mobileconfig('managedmac.portablehomes.alacarte').with_ensure('absent')
+        is_expected.to contain_mobileconfig('managedmac.portablehomes.alacarte').with_ensure('absent')
       end
     end
 
-    context "when product version is 10.10 and $enable == true" do
+    context 'when product version is 10.10 and $enable == true' do
       let :facts do
         {
-          :macosx_productversion_major => '10.10',
+          macosx_productversion_major: '10.10',
         }
       end
 
       let(:params) do
-        { :enable => true }
+        { enable: true }
       end
+
       it do
-        should contain_mobileconfig('managedmac.portablehomes.alacarte').with_ensure('present')
+        is_expected.to contain_mobileconfig('managedmac.portablehomes.alacarte').with_ensure('present')
       end
     end
 
-    context "when product version is 10.10 and $enable == false" do
+    context 'when product version is 10.10 and $enable == false' do
       let :facts do
         {
-          :macosx_productversion_major => '10.10',
+          macosx_productversion_major: '10.10',
         }
       end
 
       let(:params) do
-        { :enable => false }
+        { enable: false }
       end
+
       it do
-        should contain_mobileconfig('managedmac.portablehomes.alacarte').with_ensure('absent')
+        is_expected.to contain_mobileconfig('managedmac.portablehomes.alacarte').with_ensure('absent')
       end
     end
-
   end
 
-  context "when $enable == $macosx_productversion_major" do
+  context 'when $enable == $macosx_productversion_major' do
     let :facts do
       {
-        :macosx_productversion_major => '10.10',
+        macosx_productversion_major: '10.10',
       }
     end
 
     let(:params) do
-      { :enable => '10.10' }
+      { enable: '10.10' }
     end
+
     it do
-      should contain_mobileconfig('managedmac.portablehomes.alacarte').with_ensure('present')
+      is_expected.to contain_mobileconfig('managedmac.portablehomes.alacarte').with_ensure('present')
     end
   end
 
-  context "when $enable != $macosx_productversion_major" do
+  context 'when $enable != $macosx_productversion_major' do
     let :facts do
       {
-        :macosx_productversion_major => '10.9',
+        macosx_productversion_major: '10.9',
       }
     end
 
     let(:params) do
-      { :enable => '10.10' }
+      { enable: '10.10' }
     end
+
     it do
-      should contain_mobileconfig('managedmac.portablehomes.alacarte').with_ensure('absent')
+      is_expected.to contain_mobileconfig('managedmac.portablehomes.alacarte').with_ensure('absent')
     end
   end
 
-  context "when $enable is passed a BAD param" do
+  context 'when $enable is passed a BAD param' do
     let(:params) do
-      { :enable => 'Whimmy wham wham wozzle!' }
+      { enable: 'Whimmy wham wham wozzle!' }
     end
-    it { should raise_error(Puppet::Error, /does not match/) }
+
+    it { is_expected.to raise_error(Puppet::Error, %r{does not match}) }
   end
 
-  context "when passed no params" do
+  context 'when passed no params' do
     it do
-      should contain_mobileconfig('managedmac.portablehomes.alacarte').with_ensure('absent')
+      is_expected.to contain_mobileconfig('managedmac.portablehomes.alacarte').with_ensure('absent')
     end
   end
 
-  context "when $menuextra has BAD param" do
+  context 'when $menuextra has BAD param' do
     let(:params) do
-      { :enable => true, :menuextra => 'on' }
+      { enable: true, menuextra: 'on' }
     end
-    it { should raise_error(Puppet::Error, /Invalid parameter/) }
+
+    it { is_expected.to raise_error(Puppet::Error, %r{Invalid parameter}) }
   end
 
-  context "when $syncPeriodSeconds has BAD param" do
+  context 'when $syncPeriodSeconds has BAD param' do
     let(:params) do
-      { :enable => true, :syncPeriodSeconds => 'foobar' }
+      { enable: true, syncPeriodSeconds: 'foobar' }
     end
-    it { should raise_error(Puppet::Error, /not an Integer/) }
+
+    it { is_expected.to raise_error(Puppet::Error, %r{not an Integer}) }
   end
 
-  context "when $syncPreferencesAtLogin has BAD param" do
+  context 'when $syncPreferencesAtLogin has BAD param' do
     let(:params) do
-      { :enable => true, :syncPreferencesAtLogin => 'foobar' }
+      { enable: true, syncPreferencesAtLogin: 'foobar' }
     end
-    it { should raise_error(Puppet::Error, /Parameter Error: invalid value/) }
+
+    it { is_expected.to raise_error(Puppet::Error, %r{Parameter Error: invalid value}) }
   end
 
-  context "when $loginPrefSyncConflictResolution has BAD param" do
+  context 'when $loginPrefSyncConflictResolution has BAD param' do
     let(:params) do
-      { :enable => true, :loginPrefSyncConflictResolution => 'foobar' }
+      { enable: true, loginPrefSyncConflictResolution: 'foobar' }
     end
-    it { should raise_error(Puppet::Error, /Parameter Error: invalid value/) }
+
+    it { is_expected.to raise_error(Puppet::Error, %r{Parameter Error: invalid value}) }
   end
 
-  context "when $excludedItems has BAD param" do
+  context 'when $excludedItems has BAD param' do
     let(:params) do
-      { :enable => true, :excludedItems => 'foobar' }
+      { enable: true, excludedItems: 'foobar' }
     end
-    it { should raise_error(Puppet::Error, /Wrong arg type.*String instead of Hash/) }
+
+    it { is_expected.to raise_error(Puppet::Error, %r{Wrong arg type.*String instead of Hash}) }
   end
 
-  context "when $syncedFolders has BAD param" do
+  context 'when $syncedFolders has BAD param' do
     let(:params) do
-      { :enable => true, :syncedFolders => 'foobar' }
+      { enable: true, syncedFolders: 'foobar' }
     end
-    it { should raise_error(Puppet::Error, /Wrong arg type.*String instead of Array/) }
+
+    it { is_expected.to raise_error(Puppet::Error, %r{Wrong arg type.*String instead of Array}) }
   end
 
-  context "when passed good params" do
+  context 'when passed good params' do
     let(:params) do
-      { :enable => true }
+      { enable: true }
     end
+
     it do
-      should contain_mobileconfig('managedmac.portablehomes.alacarte').with_ensure('present')
+      is_expected.to contain_mobileconfig('managedmac.portablehomes.alacarte').with_ensure('present')
     end
   end
-
 end

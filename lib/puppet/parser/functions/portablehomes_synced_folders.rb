@@ -1,8 +1,8 @@
 module Puppet::Parser::Functions
-  newfunction(:portablehomes_synced_folders, :type => :rvalue, :doc => <<-EOS
+  newfunction(:portablehomes_synced_folders, type: :rvalue, doc: <<-EOS
 Returns a Array of properly formatted syncedFolder Hashes.
     EOS
-  ) do |args|
+             ) do |args|
 
     if args.size != 1
       e = "portablehomes_synced_folders(): Too many args! (#{args.size} instead of 1)"
@@ -14,10 +14,8 @@ Returns a Array of properly formatted syncedFolder Hashes.
       raise(Puppet::ParseError, e)
     end
 
-    args[0].inject([]) do |memo,e|
-      memo << {'path' => e}
-      memo
+    args[0].each_with_object([]) do |e, memo|
+      memo << { 'path' => e }
     end
-
   end
 end
