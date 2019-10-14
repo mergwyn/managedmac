@@ -48,7 +48,7 @@ Puppet::Type.newtype(:dsconfigad) do
 
     # Method for testing no_flag String type attribute equality
     define_method(:no_flag_insync?) do |is, should|
-      return (is == :absent) if should == :absent || should == ''
+      return (is == :absent) if [:absent, ''].include?(should)
       is == should
     end
   end

@@ -60,6 +60,7 @@ module CFPropertyList
     end
   end
 
+  # XML interface
   class XMLParserInterface < ParserInterface
     def new_node(name); end
 
@@ -69,6 +70,7 @@ module CFPropertyList
   end
 end
 
+# String
 class String
   unless ''.respond_to?(:bytesize)
     def bytesize
@@ -85,9 +87,7 @@ require dirname + '/rbBinaryCFPropertyList.rb'
 require 'iconv' unless ''.respond_to?('encode')
 
 # ensure that the module and class exist
-module Enumerable
-  class Enumerator
-  end
+module Enumerable::Enumerator
 end
 
 begin
@@ -109,6 +109,7 @@ if try_nokogiri
   end
 end
 
+# Create CFType hierarchy
 module CFPropertyList
   # Create CFType hierarchy by guessing the correct CFType, e.g.
   #
@@ -386,8 +387,8 @@ module CFPropertyList
   end
 end
 
+# convert an array to plist format
 class Array
-  # convert an array to plist format
   def to_plist(options = {})
     options[:plist_format] ||= CFPropertyList::List::FORMAT_BINARY
 
@@ -397,8 +398,8 @@ class Array
   end
 end
 
+# convert an array to plist format
 class Enumerator
-  # convert an array to plist format
   def to_plist(options = {})
     options[:plist_format] ||= CFPropertyList::List::FORMAT_BINARY
 
@@ -408,8 +409,8 @@ class Enumerator
   end
 end
 
+# convert a hash to plist format
 class Hash
-  # convert a hash to plist format
   def to_plist(options = {})
     options[:plist_format] ||= CFPropertyList::List::FORMAT_BINARY
 

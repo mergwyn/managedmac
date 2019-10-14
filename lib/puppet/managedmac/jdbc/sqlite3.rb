@@ -5,7 +5,9 @@ warn 'Jdbc-SQLite3 is only for use with JRuby' if begin
                                                    end
 require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'managedmac', 'jdbc', 'sqlite3', 'version'))
 
+# JDBC module
 module Jdbc
+  # SQLite3
   module SQLite3
     def self.driver_jar
       "sqlite-jdbc-#{DRIVER_VERSION}.jar"

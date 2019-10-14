@@ -13,7 +13,7 @@ Facter.add('macaddress_primary') do
     devices = native['Interfaces'].select { |d|
       d['IOBuiltin'] &&
         d['IOInterfaceNamePrefix'].eql?('en') && (d['IOPathMatch'] !~ %r{thunderbolt|usb|firewire}i)
-    }.sort_by { |d| d['IOInterfaceUnit'] }
+    }.sort_by { |d| d['IOInterfaceUnit'] } # rubocop:disable Style/MultilineBlockChain
     devices[0]['IOMACAddress'].unpack('H*').first.scan(%r{..}).join(':')
   end
 end

@@ -69,7 +69,6 @@ module Helpers
         'groups'     => ['_appserveradm', '_appserverusr', '_lpadmin', 'admin', 'com.apple.sharepoint.group.1'],
         'home'       => '/Users/bar',
         'iterations' => 33_682,
-        'password'   => '6e849409877191dd5b28bcbda2e0619dbe7ee6c6fc30620eb2508df6cbfcf5b57cac66da5a65812aa50970510f72a45b690402325d5cb736095780ef288f5c2be85ea70a49006b94835c8bbf66445656a1f4c3f1c2ec2c89666aaace545d2b2e88de634a779b9d909b6f62e8e182d4dd843b5952fb2913bdfa6a0e824e6c3cea',
         'salt'       => '4b07f6938c5774751b2d794d5b18200584a0fbd1b23b62a43491f5f7aeb9e174',
         'shell'      => '/bin/bash',
         'uid'        => 501,
@@ -82,7 +81,13 @@ module Helpers
         'groups'     => ['_appserveradm', '_appserverusr', '_lpadmin', 'admin', 'com.apple.sharepoint.group.1'],
         'home'       => '/Users/bar',
         'iterations' => 31_260,
-        'password'   => '6e849409877191dd5b28bcbda2e0619dbe7ee6c6fc30620eb2508df6cbfcf5b57cab66da5a65812aa50970510f72a45b690402325d5cb736095780ef288f5c2be85ea70a49006b94835c8bbf66445656a1f4c3f1c2ec2c89666aaace545d2b2e88de634a779b9d909b6f62e8e182d4dd843b5952fb2913bdfa6a0e824e6c3cea',
+        'password'   => <<-END.strip,
+                        6e849409877191dd5b28bcbda2e0619dbe7ee6c6fc30620eb2508df6cb
+                        fcf5b57cac66da5a65812aa50970510f72a45b690402325d5cb7360957
+                        80ef288f5c2be85ea70a49006b94835c8bbf66445656a1f4c3f1c2ec2c
+                        89666aaace545d2b2e88de634a779b9d909b6f62e8e182d4dd843b5952
+                        fb2913bdfa6a0e824e6c3cea
+                        END
         'salt'       => '4b07f6938c4774751b2d794d5b18200584a0fbd1b23b62a43491f5f7aeb9e174',
         'shell'      => '/bin/bash',
         'uid'        => 502,

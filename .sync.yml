@@ -15,3 +15,11 @@ Rakefile:
   default_disabled_lint_checks:
     - 'relative'
     - 'variable_is_lowercase'
+
+.rubocop.yml:
+  default_configs:
+    Style/PredicateName:
+      NameWhitelist:
+        - is_to_s
+    Style/FileName:
+      Enabled: false

@@ -2,6 +2,7 @@ require 'etc'
 require 'fileutils'
 require 'cfpropertylist'
 
+# PropertyList class
 class Puppet::Provider::PropertyList < Puppet::Provider
   confine operatingsystem: :darwin
 

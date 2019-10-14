@@ -148,7 +148,7 @@ describe 'managedmac::mcx', type: 'class' do
 
     it {
       is_expected.to contain_mobileconfig('managedmac.mcx.alacarte').with_content(
-        /\/path\/to\/some\/file/,
+        %r{/path/to/some/file},
       )
     }
   end

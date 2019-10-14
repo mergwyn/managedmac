@@ -64,11 +64,10 @@ end
 
 # Validate the format argument
 def validate_format(format)
-  unless FORMATS.include? format
-    puts "Invalid Format! \'#{format}\'"
-    output_help
-    exit 1
-  end
+  return unless FORMATS.include? format
+  puts "Invalid Format! \'#{format}\'"
+  output_help
+  exit 1
 end
 
 ###########################################
