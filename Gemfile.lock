@@ -129,7 +129,7 @@ GEM
     minitest (5.12.2)
     mocha (1.1.0)
       metaclass (~> 0.0.1)
-    multi_json (1.13.1)
+    multi_json (1.14.1)
     multipart-post (2.1.1)
     necromancer (0.5.0)
     net-http-persistent (3.1.0)
