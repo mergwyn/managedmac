@@ -7,16 +7,6 @@ describe 'managedmac::cron', type: 'class' do
     context "on #{os}" do
       let(:facts) { facts }
 
-      let(:cron_jobs) do
-        {
-          'who_dump' => {
-            'command' => '/usr/bin/who > /tmp/who.dump',
-          },
-          'ps_dump' => {
-            'command' => '/bin/ps aux > /tmp/ps.dump',
-          },
-        }
-      end
       context 'when $jobs is invalid' do
         let(:params) do
           { jobs: 'This is not a Hash.' }
