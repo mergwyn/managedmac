@@ -48,8 +48,8 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
 
       begin
         profiles(['-P', '-o', path])
-      rescue Puppet::ExecutionFailure => e
-        raise Puppet::Error, "#mobileconfig: command returned non-zero
+      rescue Puppet::ExecutionFailure #=> e
+        raise $ERROR_INFO, Puppet::Error, "#mobileconfig: command returned non-zero #{$ERROR_INFO}
           `profiles -P -o #{path}`"
       end
 
@@ -333,9 +333,9 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
       id = @resource[:name]
       begin
         profiles(['-R', '-p', id])
-      rescue Puppet::ExecutionFailure => e
-        raise Puppet::Error, "#mobileconfig: command returned
-          non-zero `profiles -R -p #{id}`"
+      rescue Puppet::ExecutionFailure #=> e
+        raise $ERROR_INFO, Puppet::Error, "#mobileconfig: command returned
+          non-zero #{$ERROR_INFO} `profiles -R -p #{id}`"
       end
 
     else
@@ -364,8 +364,8 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
 
       begin
         profiles(['-I', '-F', path])
-      rescue Puppet::ExecutionFailure => e
-        raise Puppet::Error, "#mobileconfig: command returned non-zero
+      rescue Puppet::ExecutionFailure #=> e
+        raise $ERROR_INFO, Puppet::Error, "#mobileconfig: command returned non-zero #{$ERROR_INFO}
           `profiles -I -F #{path}`"
       end
 
