@@ -25,7 +25,7 @@ describe 'managedmac::execs', type: 'class' do
       { commands: {} }
     end
 
-    specify { is_expected.not_to contain_exec }
+    specify { is_expected.not_to contain_exec('') }
   end
 
   context 'when $commands contains invalid data' do
