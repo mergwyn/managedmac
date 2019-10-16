@@ -25,7 +25,7 @@ describe 'managedmac::files', type: 'class' do
       { objects: {} }
     end
 
-    specify { is_expected.not_to contain_file }
+    specify { is_expected.not_to contain_file('*') }
   end
 
   context 'when $objects contains invalid data' do
