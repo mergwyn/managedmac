@@ -1,5 +1,6 @@
 fixtures:
-  repositories:
-    stdlib: git://github.com/puppetlabs/puppetlabs-stdlib.git
+  forge_modules:
+    stdlib: "puppetlabs/stdlib"
+    cron_core: "puppetlabs/cron_core"
   symlinks:
     managedmac: "#{source_dir}"

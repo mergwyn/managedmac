@@ -1,56 +1,74 @@
 require 'spec_helper'
 
 describe 'managedmac::cron', type: 'class' do
-  context 'when $jobs is invalid' do
-    let(:params) do
-      { jobs: 'This is not a Hash.' }
-    end
+  on_supported_os.each do |os, facts|
+    let(:node) { 'testhost.test.com' }
 
-    it { is_expected.to raise_error(Puppet::Error) }
-  end
+    context "on #{os}" do
+      let(:facts) { facts }
 
-  context 'when $defaults is invalid' do
-    let(:params) do
-      {
-        jobs: { fake: 'data' },
-        defaults: 'This is not a Hash.',
-      }
-    end
+      let(:cron_jobs) do
+        {
+          'who_dump' => {
+            'command' => '/usr/bin/who > /tmp/who.dump',
+          },
+          'ps_dump' => {
+            'command' => '/bin/ps aux > /tmp/ps.dump',
+          },
+        }
+      end
+      context 'when $jobs is invalid' do
+        let(:params) do
+          { jobs: 'This is not a Hash.' }
+        end
 
-    it { is_expected.to raise_error(Puppet::Error) }
-  end
+        it { is_expected.to raise_error(Puppet::Error) }
+      end
 
-  context 'when $jobs is empty' do
-    let(:params) do
-      { jobs: {} }
-    end
+      context 'when $defaults is invalid' do
+        let(:params) do
+          {
+            jobs: { fake: 'data' },
+            defaults: 'This is not a Hash.',
+          }
+        end
 
-    specify { is_expected.not_to contain_cron }
-  end
+        it { is_expected.to raise_error(Puppet::Error) }
+      end
 
-  context 'when $jobs contains invalid data' do
-    let(:params) do
-      the_data = cron_jobs.merge('bad_data' => 'Not a Hash.')
-      { jobs: the_data }
-    end
+      context 'when $jobs is empty' do
+        let(:params) do
+          { jobs: {} }
+        end
 
-    it { is_expected.to raise_error(Puppet::Error) }
-  end
+        specify { is_expected.not_to contain_cron('') }
+      end
 
-  context 'when $jobs is VALID' do
-    let(:params) do
-      { jobs: cron_jobs }
-    end
+      context 'when $jobs contains invalid data' do
+        let(:params) do
+          the_data = cron_jobs.merge('bad_data' => 'Not a Hash.')
+          { jobs: the_data }
+        end
 
-    it do
-      is_expected.to contain_cron('who_dump').with(
-        'command' => '/usr/bin/who > /tmp/who.dump',
-      )
-    end
-    it do
-      is_expected.to contain_cron('ps_dump').with(
-        'command' => '/bin/ps aux > /tmp/ps.dump',
-      )
+        it { is_expected.to raise_error(Puppet::Error) }
+      end
+
+      context 'when $jobs is VALID' do
+        let(:params) do
+          { jobs: cron_jobs }
+        end
+
+        it do
+          is_expected.to contain_cron('who_dump').with(
+            'command' => '/usr/bin/who > /tmp/who.dump',
+          )
+        end
+        it do
+          is_expected.to contain_cron('ps_dump').with(
+            'command' => '/bin/ps aux > /tmp/ps.dump',
+          )
+        end
+      end
     end
   end
 end
