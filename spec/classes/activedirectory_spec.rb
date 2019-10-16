@@ -4,6 +4,7 @@ describe 'managedmac::activedirectory', type: 'class' do
   on_supported_os.each do |os, facts|
     context "on #{os}" do
       let(:facts) { facts }
+
       context 'when $enable == undef' do
         it { is_expected.to compile.with_all_deps }
       end
@@ -51,12 +52,12 @@ describe 'managedmac::activedirectory', type: 'class' do
           end
         end
 
-          context 'when $evaluate is false' do
-            let(:params) do
-              { enable: false, provider: 'dsconfigad', evaluate: 'false' }
-            end
-            context 'when $provider == :dsconfigad' do
+        context 'when $evaluate is false' do
+          let(:params) do
+            { enable: false, provider: 'dsconfigad', evaluate: 'false' }
+          end
 
+          context 'when $provider == :dsconfigad' do
             specify do
               is_expected.not_to contain_dsconfigad('foo.ad.com')
             end
