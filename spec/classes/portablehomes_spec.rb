@@ -6,13 +6,7 @@ describe 'managedmac::portablehomes', type: 'class' do
       let(:facts) { facts }
 
       context "product version doesn't matter when $enable is a BOOL" do
-        context 'when product version is 10.9 and $enable == true' do
-          let :facts do
-            {
-              macosx_productversion_major: '10.9',
-            }
-          end
-
+        context 'when $enable == true' do
           let(:params) do
             { enable: true }
           end
@@ -22,45 +16,7 @@ describe 'managedmac::portablehomes', type: 'class' do
           end
         end
 
-        context 'when product version is 10.9 and $enable == false' do
-          let :facts do
-            {
-              macosx_productversion_major: '10.9',
-            }
-          end
-
-          let(:params) do
-            { enable: false }
-          end
-
-          it do
-            is_expected.to contain_mobileconfig('managedmac.portablehomes.alacarte').with_ensure('absent')
-          end
-        end
-
-        context 'when product version is 10.10 and $enable == true' do
-          let :facts do
-            {
-              macosx_productversion_major: '10.10',
-            }
-          end
-
-          let(:params) do
-            { enable: true }
-          end
-
-          it do
-            is_expected.to contain_mobileconfig('managedmac.portablehomes.alacarte').with_ensure('present')
-          end
-        end
-
-        context 'when product version is 10.10 and $enable == false' do
-          let :facts do
-            {
-              macosx_productversion_major: '10.10',
-            }
-          end
-
+        context 'when $enable == false' do
           let(:params) do
             { enable: false }
           end
@@ -72,34 +28,12 @@ describe 'managedmac::portablehomes', type: 'class' do
       end
 
       context 'when $enable == $macosx_productversion_major' do
-        let :facts do
-          {
-            macosx_productversion_major: '10.10',
-          }
-        end
-
         let(:params) do
-          { enable: '10.10' }
+          { enable: facts[:macosx_productversion_major] }
         end
 
         it do
           is_expected.to contain_mobileconfig('managedmac.portablehomes.alacarte').with_ensure('present')
-        end
-      end
-
-      context 'when $enable != $macosx_productversion_major' do
-        let :facts do
-          {
-            macosx_productversion_major: '10.9',
-          }
-        end
-
-        let(:params) do
-          { enable: '10.10' }
-        end
-
-        it do
-          is_expected.to contain_mobileconfig('managedmac.portablehomes.alacarte').with_ensure('absent')
         end
       end
 
@@ -108,7 +42,7 @@ describe 'managedmac::portablehomes', type: 'class' do
           { enable: 'Whimmy wham wham wozzle!' }
         end
 
-        it { is_expected.to raise_error(Puppet::Error, %r{does not match}) }
+        it { is_expected.to raise_error(Puppet::PreformattedError, %r{Evaluation Error: Error while evaluating a Resource Statement}) }
       end
 
       context 'when passed no params' do
@@ -122,7 +56,7 @@ describe 'managedmac::portablehomes', type: 'class' do
           { enable: true, menuextra: 'on' }
         end
 
-        it { is_expected.to raise_error(Puppet::Error, %r{Invalid parameter}) }
+        it { is_expected.to raise_error(Puppet::PreformattedError, %r{Evaluation Error: Error while evaluating a Resource Statement}) }
       end
 
       context 'when $syncPeriodSeconds has BAD param' do

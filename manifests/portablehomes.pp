@@ -386,7 +386,9 @@
 #
 class managedmac::portablehomes (
 
-  $enable                               = false,
+  #$enable                               = false,
+# TODO create a type for enable
+  Variant[Boolean,Pattern['^10\.\d{2}\.?\d{0,2}$']] $enable = false,
   $syncedFolders                        = ['~'],
   $syncedPrefFolders                    = [
     '~/Library',
@@ -476,12 +478,14 @@ class managedmac::portablehomes (
   $enable_re_values = ['^true$', '^false$', '^10\.\d{1,2}\.?\d{0,2}$',]
 
   # Validate $enable as a string
-  validate_re ($enable, $enable_re_values)
+  #validate_re ($enable, $enable_re_values)
 
   # Evaluate $enable as an OS X major version string and deduce a state
-  $os_conditional = versioncmp($enable, $::macosx_productversion_major) ? {
-    0       => present,
-    default => absent,
+  unless is_bool($enable) {
+    $os_conditional = versioncmp($enable, $::macosx_productversion_major) ? {
+      0       => present,
+      default => absent,
+    }
   }
 
   # Set ensure according to defined logic
