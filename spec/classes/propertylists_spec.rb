@@ -30,7 +30,7 @@ describe 'managedmac::propertylists', type: 'class' do
         end
 
         specify do
-          is_expected.not_to contain_propertylist
+          is_expected.not_to contain_property_list('*')
         end
       end
 
@@ -52,11 +52,11 @@ describe 'managedmac::propertylists', type: 'class' do
         end
 
         specify do
-          is_expected.to contain_propertylist('/path/to/a/file.plist')\
+          is_expected.to contain_property_list('/path/to/a/file.plist')\
             .with_content(%r{A string})
         end
         specify do
-          is_expected.to contain_propertylist('/path/to/b/file.plist')\
+          is_expected.to contain_property_list('/path/to/b/file.plist')\
             .with_content(%r{foo})
         end
       end

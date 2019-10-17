@@ -9,7 +9,7 @@ class Puppet::Provider::PropertyList < Puppet::Provider
   class << self
     def instances
       args = Puppet::Util::CommandLine.new.args
-      resource_type, resource_name = args.each { |x| x }
+      _resource_type, resource_name = args.each { |x| x }
       unless resource_name
         err = ['Listing property_list instances is not supported.',
                'Please specify a file or directory, e.g. puppet resource file /etc'].join(' ')
