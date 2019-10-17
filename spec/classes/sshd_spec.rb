@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe 'managedmac::sshd', type: 'class' do
   on_supported_os.each do |os, facts|
-
     context "on #{os}" do
       let(:facts) { facts }
 
@@ -10,20 +9,20 @@ describe 'managedmac::sshd', type: 'class' do
         let(:params) do
           { enable: '' }
         end
-    
+
         it { is_expected.not_to contain_macgroup('com.apple.access_ssh-disabled') }
         it { is_expected.not_to contain_macgroup('com.apple.access_ssh') }
         it { is_expected.not_to contain_service('com.openssh.sshd') }
         it { is_expected.not_to contain_file('sshd_config') }
         it { is_expected.not_to contain_file('sshd_banner') }
       end
-    
+
       context 'when $enable != undef' do
         context 'when $enable == false' do
           let(:params) do
             { enable: false }
           end
-    
+
           it do
             is_expected.to contain_macgroup(
               'com.apple.access_ssh-disabled',
@@ -40,12 +39,12 @@ describe 'managedmac::sshd', type: 'class' do
             is_expected.to contain_service('com.openssh.sshd').with_ensure(false)
           end
         end
-    
+
         context 'when $enable == true' do
           let(:params) do
             { enable: true }
           end
-    
+
           it do
             is_expected.to contain_macgroup(
               'com.apple.access_ssh-disabled',
@@ -61,12 +60,12 @@ describe 'managedmac::sshd', type: 'class' do
           it do
             is_expected.to contain_service('com.openssh.sshd').with_ensure(true)
           end
-    
+
           context 'when users are defined' do
             let(:params) do
               { enable: true, users: ['foo', 'bar', 'bar'] }
             end
-    
+
             it do
               is_expected.to contain_macgroup(
                 'com.apple.access_ssh',
@@ -78,12 +77,12 @@ describe 'managedmac::sshd', type: 'class' do
               is_expected.to contain_service('com.openssh.sshd').with_ensure(true)
             end
           end
-    
+
           context 'when groups are defined' do
             let(:params) do
               { enable: true, groups: ['foo', 'bar', 'bar'] }
             end
-    
+
             it do
               is_expected.to contain_macgroup(
                 'com.apple.access_ssh',
@@ -95,7 +94,7 @@ describe 'managedmac::sshd', type: 'class' do
               is_expected.to contain_service('com.openssh.sshd').with_ensure(true)
             end
           end
-    
+
           context 'when sshd_config is defined' do
             let(:params) do
               {
@@ -103,7 +102,7 @@ describe 'managedmac::sshd', type: 'class' do
                 sshd_config: 'puppet:///modules/mmv2/services/sshd/sshd_config',
               }
             end
-    
+
             it do
               is_expected.to contain_file('sshd_config').with_ensure('file')
             end
@@ -111,7 +110,7 @@ describe 'managedmac::sshd', type: 'class' do
               is_expected.to contain_service('com.openssh.sshd').with_ensure(true)
             end
           end
-    
+
           context 'when sshd_banner is defined' do
             let(:params) do
               {
@@ -119,7 +118,7 @@ describe 'managedmac::sshd', type: 'class' do
                 sshd_banner: 'puppet:///modules/mmv2/services/sshd/sshd_banner',
               }
             end
-    
+
             it do
               is_expected.to contain_file('sshd_banner').with_ensure('file')
             end
@@ -127,7 +126,7 @@ describe 'managedmac::sshd', type: 'class' do
               is_expected.to contain_service('com.openssh.sshd').with_ensure(true)
             end
           end
-    
+
           context 'when sshd_banner is a BAD path' do
             let(:params) do
               {
@@ -135,7 +134,7 @@ describe 'managedmac::sshd', type: 'class' do
                 sshd_banner: 'this is not valid',
               }
             end
-    
+
             it { is_expected.to raise_error(Puppet::Error, %r{does not match}) }
           end
         end
