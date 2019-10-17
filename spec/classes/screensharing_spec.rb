@@ -7,7 +7,7 @@ describe 'managedmac::screensharing', type: 'class' do
 
       context 'when $enable == undef' do
         let(:params) do
-          { enable: '' }
+          { enable: :undef }
         end
 
         it { is_expected.not_to contain_macgroup('com.apple.access_screensharing') }
