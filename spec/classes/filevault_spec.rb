@@ -6,6 +6,7 @@ describe 'managedmac::filevault', type: 'class' do
       let(:facts) { facts }
 
       context 'when $enable == false' do
+        let(:facts) { super().merge(filevault_active: true) }
         let(:params) do
           { enable: false }
         end
@@ -19,7 +20,7 @@ describe 'managedmac::filevault', type: 'class' do
       end
 
       context 'when $enable == false and $remove_fde and $::filevault_active == true' do
-        let(:facts) { { filevault_active: true } }
+        let(:facts) { super().merge(filevault_active: true) }
         let(:params) do
           { enable: false, remove_fde: true }
         end
@@ -33,7 +34,7 @@ describe 'managedmac::filevault', type: 'class' do
       end
 
       context 'when $enable == false and $remove_fde and $::filevault_active == false' do
-        let(:facts) { { filevault_active: false } }
+        let(:facts) { super().merge(filevault_active: false) }
         let(:params) do
           { enable: false, remove_fde: true }
         end
