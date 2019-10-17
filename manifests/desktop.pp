@@ -82,18 +82,12 @@ class managedmac::desktop (
     },
   }
 
-  if $override_picture_path != undef or $locked != undef {
-    # Should return Array
-    $content = process_mobileconfig_params($params)
+  # Should return Array
+  $content = process_mobileconfig_params($params)
 
-    $mobileconfig_ensure = empty($content) ? {
-      true  => 'absent',
-      false => 'present',
-    }
-  }
-  else {
-    $content = []
-    $mobileconfig_ensure = 'absent'
+  $mobileconfig_ensure = empty($content) ? {
+    true  => 'absent',
+    false => 'present',
   }
 
   $organization = hiera('managedmac::organization', 'SFU')
