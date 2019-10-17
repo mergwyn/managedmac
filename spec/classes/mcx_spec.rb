@@ -34,7 +34,7 @@ describe 'managedmac::mcx', type: 'class' do
           { bluetooth: 'foo' }
         end
 
-        it { is_expected.to raise_error(Puppet::Error, %r{not a boolean}) }
+        it { is_expected.to raise_error(Puppet::PreformattedError, %r{Evaluation Error: Error while evaluating a Resource Statement}) }
       end
 
       context 'when $bluetooth == on' do
@@ -126,11 +126,7 @@ describe 'managedmac::mcx', type: 'class' do
           { wifi: '' }
         end
 
-        it {
-          is_expected.to contain_mobileconfig('managedmac.mcx.alacarte').with_ensure(
-            'absent',
-          )
-        }
+        it { is_expected.to raise_error(Puppet::PreformattedError, %r{Evaluation Error: Error while evaluating a Resource Statement}) }
       end
 
       context "when $bluetooth == ''" do
@@ -138,11 +134,7 @@ describe 'managedmac::mcx', type: 'class' do
           { bluetooth: '' }
         end
 
-        it {
-          is_expected.to contain_mobileconfig('managedmac.mcx.alacarte').with_ensure(
-            'absent',
-          )
-        }
+        it { is_expected.to raise_error(Puppet::PreformattedError, %r{Evaluation Error: Error while evaluating a Resource Statement}) }
       end
 
       context 'when $logintitems are defined' do

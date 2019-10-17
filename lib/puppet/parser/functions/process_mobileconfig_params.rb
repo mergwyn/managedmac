@@ -19,7 +19,7 @@ data. Keys with empty or :undef values will be expunged.
     end
 
     params.each_with_object([]) do |(domain, hash), memo|
-      hash.delete_if { |_k, v| (v.respond_to?(:empty?) && v.empty?) || v == :undef || v.nil?  }
+      hash.delete_if { |_k, v| (v.respond_to?(:empty?) && v.empty?) || v == :undef || v.nil? }
       unless hash.empty?
         hash['PayloadType'] = domain
         memo << hash
