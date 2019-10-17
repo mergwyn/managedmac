@@ -30,7 +30,7 @@ describe 'managedmac::mobileconfigs', type: 'class' do
         end
 
         specify do
-          is_expected.not_to contain_mobileconfig
+          is_expected.not_to contain_mobileconfig('*')
         end
       end
 
