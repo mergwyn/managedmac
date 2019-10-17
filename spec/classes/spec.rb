@@ -1,3 +1,4 @@
+#TODO reinstate test
 require 'spec_helper'
 
 describe 'managedmac', type: 'class' do
@@ -35,38 +36,34 @@ describe 'managedmac', type: 'class' do
   end
 
   # The remainder of our specs will go inside this context block
-  context 'on a supported operating system and product version' do
-    # On our target platform, we should have green lights.
-    let :facts do
-      {
-        osfamily: 'Darwin',
-        macosx_productversion_major: '10.10',
-      }
-    end
+  on_supported_os.each do |os, facts|
+    context "on #{os}" do
+      let(:facts) { facts }
 
-    it { is_expected.to contain_class('managedmac::ntp') }
-    it { is_expected.to contain_class('managedmac::activedirectory') }
-    it { is_expected.to contain_class('managedmac::security') }
-    it { is_expected.to contain_class('managedmac::desktop') }
-    it { is_expected.to contain_class('managedmac::mcx') }
-    it { is_expected.to contain_class('managedmac::filevault') }
-    it { is_expected.to contain_class('managedmac::loginwindow') }
-    it { is_expected.to contain_class('managedmac::softwareupdate') }
-    it { is_expected.to contain_class('managedmac::authorization') }
-    it { is_expected.to contain_class('managedmac::energysaver') }
-    it { is_expected.to contain_class('managedmac::portablehomes') }
-    it { is_expected.to contain_class('managedmac::mounts') }
-    it { is_expected.to contain_class('managedmac::loginhook') }
-    it { is_expected.to contain_class('managedmac::logouthook') }
-    it { is_expected.to contain_class('managedmac::sshd') }
-    it { is_expected.to contain_class('managedmac::remotemanagement') }
-    it { is_expected.to contain_class('managedmac::screensharing') }
-    it { is_expected.to contain_class('managedmac::mobileconfigs') }
-    it { is_expected.to contain_class('managedmac::propertylists') }
-    it { is_expected.to contain_class('managedmac::execs') }
-    it { is_expected.to contain_class('managedmac::files') }
-    it { is_expected.to contain_class('managedmac::users') }
-    it { is_expected.to contain_class('managedmac::groups') }
-    it { is_expected.to contain_class('managedmac::cron') }
+      it { is_expected.to contain_class('managedmac::ntp') }
+      it { is_expected.to contain_class('managedmac::activedirectory') }
+      it { is_expected.to contain_class('managedmac::security') }
+      it { is_expected.to contain_class('managedmac::desktop') }
+      it { is_expected.to contain_class('managedmac::mcx') }
+      it { is_expected.to contain_class('managedmac::filevault') }
+      it { is_expected.to contain_class('managedmac::loginwindow') }
+      it { is_expected.to contain_class('managedmac::softwareupdate') }
+      it { is_expected.to contain_class('managedmac::authorization') }
+      it { is_expected.to contain_class('managedmac::energysaver') }
+      it { is_expected.to contain_class('managedmac::portablehomes') }
+      it { is_expected.to contain_class('managedmac::mounts') }
+      it { is_expected.to contain_class('managedmac::loginhook') }
+      it { is_expected.to contain_class('managedmac::logouthook') }
+      it { is_expected.to contain_class('managedmac::sshd') }
+      it { is_expected.to contain_class('managedmac::remotemanagement') }
+      it { is_expected.to contain_class('managedmac::screensharing') }
+      it { is_expected.to contain_class('managedmac::mobileconfigs') }
+      it { is_expected.to contain_class('managedmac::propertylists') }
+      it { is_expected.to contain_class('managedmac::execs') }
+      it { is_expected.to contain_class('managedmac::files') }
+      it { is_expected.to contain_class('managedmac::users') }
+      it { is_expected.to contain_class('managedmac::groups') }
+      it { is_expected.to contain_class('managedmac::cron') }
+    end
   end
 end
