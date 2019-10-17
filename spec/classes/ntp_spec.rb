@@ -7,10 +7,10 @@ describe 'managedmac::ntp' do
       let(:facts) { facts }
       let(:service) do
         case facts[:macosx_productversion_major]
-        when '10.14'
-          'com.apple.timed'
-        else
+        when '10.12'
           'org.ntp.ntpd'
+        else
+          'com.apple.timed'
         end
       end
 

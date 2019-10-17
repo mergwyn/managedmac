@@ -1,0 +1,3 @@
+---
+
+managedmac::ntp::service: 'org.ntp.ntpd'
