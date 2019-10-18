@@ -1,3 +1,1 @@
 ---
-
-managedmac::ntp::service: 'com.apple.timed'
