@@ -29,7 +29,7 @@ describe 'managedmac::users', type: 'class' do
           { accounts: {} }
         end
 
-        specify { is_expected.not_to contain_user }
+        specify { is_expected.not_to contain_user('*') }
       end
 
       context 'when $accounts contains invalid data' do
