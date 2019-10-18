@@ -64,7 +64,7 @@ Puppet::Type.type(:dsconfigad).provide(:default) do
       define_method(m) do |value|
         args = [m, value]
         args << true if i != 0
-        flag_setter *args
+        flag_setter(*args)
       end
     end
   end
@@ -73,7 +73,7 @@ Puppet::Type.type(:dsconfigad).provide(:default) do
     include ManagedMacCommon
 
     def instances
-      config = new(get_resource_properties)
+      config = new(resource_properties)
       instances = []
       unless config.ensure == :absent
         instances << config
@@ -84,14 +84,14 @@ Puppet::Type.type(:dsconfigad).provide(:default) do
     # Puppet MAGIC
     def prefetch(resources)
       instances.each do |prov|
-        if resource = resources[prov.name]
+        if resource = resources[prov.name] # rubocop:disable Lint/AssignmentInCondition
           resource.provider = prov
         end
       end
     end
 
-    def get_resource_properties
-      config = get_active_directory_configuration
+    def resource_properties
+      config = active_directory_configuration
       return {} if nil_or_empty?(config)
       transform_config config
     end
@@ -117,7 +117,7 @@ Puppet::Type.type(:dsconfigad).provide(:default) do
       end
     end
 
-    def get_active_directory_configuration
+    def active_directory_configuration
       dict = dsconfigad('-show', '-xml')
       flatten_config read_plist_from_string(dict)
     end
@@ -160,7 +160,7 @@ Puppet::Type.type(:dsconfigad).provide(:default) do
              ["-no#{flag}"]
            else
              ["-#{flag}", value]
-    end
+           end
     (@configuration_flags ||= []) << args
   end
 
@@ -226,14 +226,14 @@ Puppet::Type.type(:dsconfigad).provide(:default) do
              args = ['-remove'] + normalize_bind_args(args).flatten
              args << '-force' if force_unbind?
              args
-    end
+           end
     dsconfigad args
     update_property_hash
   end
 
   def configure
     notice('Configuring plugin...')
-    dsconfigad (@configuration_flags || build_configuration_options).flatten!
+    dsconfigad (@configuration_flags || build_configuration_options).flatten! # rubocop:disable Lint/ParenthesesAsGroupedExpression
     update_property_hash
   end
 
@@ -252,7 +252,7 @@ Puppet::Type.type(:dsconfigad).provide(:default) do
   end
 
   def update_property_hash
-    @property_hash = self.class.get_resource_properties
+    @property_hash = self.class.resource_properties
   end
 
   def flush
