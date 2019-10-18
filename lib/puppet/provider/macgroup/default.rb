@@ -22,7 +22,7 @@ Puppet::Type.type(:macgroup).provide(:default) do
     # Puppet MAGIC
     def prefetch(resources)
       instances.each do |prov|
-        if resource = resources[prov.name]
+        if resource = resources[prov.name] # rubocop:disable Lint/AssignmentInCondition
           resource.provider = prov
         end
       end
@@ -128,7 +128,7 @@ Puppet::Type.type(:macgroup).provide(:default) do
       op = :edit
       begin
         dseditgroup([cmd_args, 'read', name].flatten)
-      rescue Puppet::ExecutionFailure => e
+      rescue Puppet::ExecutionFailure => _e
         op = :create
       end
       cmd_args << op
