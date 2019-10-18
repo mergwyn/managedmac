@@ -92,7 +92,7 @@ end
 
 begin
   require dirname + '/rbLibXMLParser.rb'
-  temp = LibXML::XML::Parser::Options::NOBLANKS; # check if we have a version with parser options
+  _temp = LibXML::XML::Parser::Options::NOBLANKS; # check if we have a version with parser options
   try_nokogiri = false
   CFPropertyList.xml_parser_interface = CFPropertyList::LibXMLParser
 rescue LoadError, NameError
@@ -103,7 +103,7 @@ if try_nokogiri
   begin
     require dirname + '/rbNokogiriParser.rb'
     CFPropertyList.xml_parser_interface = CFPropertyList::NokogiriXMLParser
-  rescue LoadError => e
+  rescue LoadError => _e
     require dirname + '/rbREXMLParser.rb'
     CFPropertyList.xml_parser_interface = CFPropertyList::ReXMLParser
   end
@@ -179,18 +179,19 @@ module CFPropertyList
   def native_types(object, keys_as_symbols = false)
     return if object.nil?
 
-    if object.is_a?(CFDate) || object.is_a?(CFString) || object.is_a?(CFInteger) || object.is_a?(CFReal) || object.is_a?(CFBoolean)
+    case object
+    when CFDate, CFString, CFInteger, CFReal, CFBoolean
       return object.value
-    elsif object.is_a?(CFData)
+    when CFData
       return CFPropertyList::Blob.new(object.decoded_value)
-    elsif object.is_a?(CFArray)
+    when CFArray
       ary = []
       object.value.each do |v|
         ary.push CFPropertyList.native_types(v)
       end
 
       return ary
-    elsif object.is_a?(CFDictionary)
+    when CFDictionary
       hsh = {}
       object.value.each_pair do |k, v|
         k = k.to_sym if keys_as_symbols
@@ -198,6 +199,8 @@ module CFPropertyList
       end
 
       return hsh
+    else
+      raise CFTypeError, "Unknown type #{objects}."
     end
   end
 
@@ -214,7 +217,7 @@ module CFPropertyList
     # Format constant for automatic format recognizing
     FORMAT_AUTO = 0
 
-    @@parsers = [Binary, CFPropertyList.xml_parser_interface]
+    @@parsers = [Binary, CFPropertyList.xml_parser_interface] # rubocop:disable Style/ClassVars
 
     # Path of PropertyList
     attr_accessor :filename
@@ -249,7 +252,7 @@ module CFPropertyList
 
     # set a list of parsers
     def self.parsers=(val)
-      @@parsers = val
+      @@parsers = val # rubocop:disable Style/ClassVars
     end
 
     # Load an XML PropertyList

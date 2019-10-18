@@ -2,7 +2,7 @@
 
 require 'nokogiri'
 
-module CFPropertyList
+module CFPropertyList # rubocop:disable Style/ClassAndModuleChildren
   # XML parser
   class NokogiriXMLParser < ParserInterface
     # read a XML file
@@ -76,7 +76,7 @@ module CFPropertyList
                   n.content
                 else
                   n.children.first.content
-      end
+                end
 
       content.force_encoding('UTF-8') if content.respond_to?(:force_encoding)
       content
@@ -97,6 +97,7 @@ module CFPropertyList
             next if n.text? # avoid a bug of libxml
             next if n.comment?
 
+            # rubocop:disable Metrics/BlockNesting
             if n.name == 'key'
               key = get_value(n)
             else
@@ -104,6 +105,7 @@ module CFPropertyList
               hsh[key] = import_xml(n)
               key = nil
             end
+            # end rubocop:disable
           end
         end
 

@@ -2,7 +2,8 @@
 
 require 'rexml/document'
 
-module CFPropertyList
+# XML parser
+module CFPropertyList # rubocop:disable Style/ClassAndModuleChildren
   # XML parser
   class ReXMLParser < ParserInterface
     # read a XML file
@@ -42,7 +43,7 @@ module CFPropertyList
                     f
                   else
                     REXML::Formatters::Default.new
-      end
+                  end
 
       str = formatter.write(doc.root, '')
       str1 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n" + str + "\n"
@@ -93,6 +94,7 @@ module CFPropertyList
             next if n.name == '#text' # avoid a bug of libxml
             next if n.name == '#comment'
 
+            # rubocop:disable Metrics/BlockNesting
             if n.name == 'key'
               key = get_value(n)
               key = '' if key.nil? # REXML returns nil if key is empty
@@ -101,6 +103,7 @@ module CFPropertyList
               hsh[key] = import_xml(n)
               key = nil
             end
+            # end rubocop:disable
           end
         end
 

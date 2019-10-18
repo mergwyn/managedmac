@@ -2,7 +2,7 @@
 
 require 'libxml'
 
-module CFPropertyList
+module CFPropertyList # rubocop:disable Style/ClassAndModuleChildren
   # XML parser
   class LibXMLParser < XMLParserInterface
     # read a XML file
@@ -74,7 +74,7 @@ module CFPropertyList
                   n.first.content
                 else
                   n.content
-      end
+                end
 
       content.force_encoding('UTF-8') if content.respond_to?(:force_encoding)
       content
@@ -94,6 +94,7 @@ module CFPropertyList
             next if n.text? # avoid a bug of libxml
             next if n.comment?
 
+            # rubocop:disable Metrics/BlockNesting
             if n.name == 'key'
               key = get_value(n)
             else
@@ -101,6 +102,7 @@ module CFPropertyList
               hsh[key] = import_xml(n)
               key = nil
             end
+            # end rubocop:disable
           end
         end
 
