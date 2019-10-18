@@ -30,7 +30,7 @@ instead of Hash)"
                 'disable'
               else
                 value
-      end
+              end
       unless value.nil? || (value.respond_to?(:empty?) && value.empty?)
         memo[key] = value
       end
