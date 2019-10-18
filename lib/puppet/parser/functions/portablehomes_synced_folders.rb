@@ -14,8 +14,8 @@ Returns a Array of properly formatted syncedFolder Hashes.
       raise(Puppet::ParseError, e)
     end
 
-    args[0].each_with_object([]) do |e, memo|
-      memo << { 'path' => e }
+    args[0].each_with_object([]) do |err, memo|
+      memo << { 'path' => err }
     end
   end
 end
