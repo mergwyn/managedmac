@@ -3,6 +3,7 @@ require 'securerandom'
 require 'fileutils'
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'managedmac', 'common'))
 
+# Mobileconfig provider
 class Puppet::Provider::MobileConfig < Puppet::Provider
   confine operatingsystem: :darwin
 
@@ -15,7 +16,7 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
     # Puppet MAGIC
     def prefetch(resources)
       fetch_resources.each do |prov|
-        if resource = resources[prov.name]
+        if resource = resources[prov.name] # rubocop:disable Lint/AssignmentInCondition#
           resource.provider = prov
         end
       end
@@ -25,9 +26,9 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
     # a method to collect the data. This way we can choose whterh or not to
     # scrub the PayloadUUID which we now use as a checksum.
     def fetch_resources(scrub_uuids = false)
-      all = get_installed_profiles
+      all = installed_profiles
       all.map do |profile|
-        resource = get_resource_properties(profile)
+        resource = resource_properties(profile)
         if scrub_uuids
           resource[:content].map! do |hash|
             hash.delete('PayloadUUID')
@@ -41,7 +42,7 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
     # Use the profiles command to return an array containing a Hash
     # representation of each of the profiles installed
     # Returns: Array
-    def get_installed_profiles
+    def installed_profiles
       # Setup a tmp dir we can dump the installed profiles in
       dir  = Dir.mktmpdir
       path = [dir, "profiles#{SecureRandom.hex}.plist"].join('/')
@@ -64,7 +65,7 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
     end
 
     # Profile read from profile dump goes in, Puppet resource comes out
-    def get_resource_properties(profile)
+    def resource_properties(profile)
       # No profile, empty Hash
       return {} if profile.nil?
 
@@ -78,7 +79,7 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
                                else
                                  # Yosemite
                                  profile['ProfileRemovalDisallowed']
-      end
+                               end
 
       # Prepare the content array for insertion into the resource
       content = prepare_content(profile['ProfileItems'])
@@ -289,7 +290,7 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
              parse_cert_data_from_string(payload['PayloadContent'])
            else
              raise Puppet::Error, 'Invalid Certificate Data!'
-    end
+           end
     payload['PayloadContent'] = CFPropertyList::Blob.new data
     payload
   end
@@ -383,11 +384,11 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
 
     # Collect the resources again once they've been changed (that way `puppet
     # resource` will show the correct values after changes have been made).
-    all_profiles = self.class.get_installed_profiles
+    all_profiles = self.class.installed_profiles
     this_profile = all_profiles.find do |profile|
       profile['ProfileIdentifier'].eql? resource[:name]
     end
 
-    @property_hash = self.class.get_resource_properties(this_profile)
+    @property_hash = self.class.resource_properties(this_profile)
   end
 end
