@@ -35,7 +35,7 @@ class Puppet::Provider::PropertyList < Puppet::Provider
         raise Puppet::Error, "Error: #{path} is not a file, [#{File.ftype(path)}]."
       end
 
-      return absent unless format = get_format(path)
+      return absent unless format == get_format(path)
 
       stat    = File.stat path
       content = read_plist path
@@ -53,7 +53,7 @@ class Puppet::Provider::PropertyList < Puppet::Provider
     def read_plist(path)
       begin
         plist = CFPropertyList::List.new(file: path)
-      rescue Exception
+      rescue => _e
         warn("Warning: #{path} is not a Property List.")
       end
       return {} unless plist
@@ -68,7 +68,7 @@ class Puppet::Provider::PropertyList < Puppet::Provider
             CFPropertyList::List::FORMAT_BINARY
           else
             raise Puppet::Error, "Bad Format: #{format}"
-      end
+          end
       plist = CFPropertyList::List.new
       plist.value = CFPropertyList.guess(content)
       plist.save(path, f, formatted: true)
@@ -76,14 +76,10 @@ class Puppet::Provider::PropertyList < Puppet::Provider
 
     def get_format(path)
       bytes = IO.read(path, 8)
-      if bytes.eql?('bplist00')
-        return :binary
-      elsif bytes =~ %r{\A\<\?xml\sve}
-        return :xml
-      else
-        warn("Error: #{path} is not a Property List.")
-        false
-      end
+      return :binary if bytes.eql?('bplist00')
+      return :xml if bytes =~ %r{\A\<\?xml\sve}
+      warn("Error: #{path} is not a Property List.")
+      false
     end
   end
 
@@ -122,7 +118,7 @@ class Puppet::Provider::PropertyList < Puppet::Provider
                 resource[:content]
               else
                 resource[:content].first
-    end
+              end
     if resource[:method] == :insert
       if File.exist?(path) && File.file?(path)
         original = self.class.read_plist path
