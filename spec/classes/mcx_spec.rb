@@ -5,10 +5,6 @@ describe 'managedmac::mcx', type: 'class' do
     context "on #{os}" do
       let(:facts) { facts }
 
-      let(:facts) do
-        { macosx_productversion_major: '10.9' }
-      end
-
       context 'when passed NO params' do
         it {
           is_expected.to contain_mobileconfig('managedmac.mcx.alacarte').with_ensure(
