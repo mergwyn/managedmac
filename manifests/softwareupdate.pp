@@ -142,7 +142,7 @@ class managedmac::softwareupdate (
 
   $swup_plist_ensure = compact_hash($swup_plist_content)
 
-  unless empty($swup_plist_content) {
+  unless empty($swup_plist_ensure) {
     property_list { '/Library/Preferences/com.apple.SoftwareUpdate.plist':
       ensure   => present,
       content  => $swup_plist_content,
