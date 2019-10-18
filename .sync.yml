@@ -15,7 +15,11 @@ Rakefile:
   default_disabled_lint_checks:
     - 'relative'
     - 'variable_is_lowercase'
-
+Gemfile:
+  required:
+    ':test':
+      - gem: CFPropertyList
+        version: '>=2.2.7'
 .rubocop.yml:
   default_configs:
     Style/PredicateName:

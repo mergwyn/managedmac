@@ -67,14 +67,6 @@ class managedmac::desktop (
 
 ) {
 
-  unless $override_picture_path == undef {
-    validate_absolute_path ($override_picture_path)
-  }
-
-  unless $locked == undef {
-    validate_bool ($locked)
-  }
-
   $params = {
     'com.apple.desktop' => {
       'override-picture-path' => $override_picture_path,
