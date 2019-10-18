@@ -1,6 +1,7 @@
 require 'cfpropertylist'
 require 'digest/md5'
 
+# common functions
 module ManagedMacCommon
   RECORD_TYPES             = [:users, :groups, :computers, :computergroups].freeze
   DSCL                     = '/usr/bin/dscl'.freeze
