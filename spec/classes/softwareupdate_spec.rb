@@ -87,7 +87,7 @@ describe 'managedmac::softwareupdate', type: 'class' do
           let(:params) do
             { automatic_update_check: true }
           end
-          
+
           it {
             is_expected.to contain_property_list(asus_plist)
               .with_ensure('present')
@@ -108,7 +108,7 @@ describe 'managedmac::softwareupdate', type: 'class' do
             { automatic_download: 'foo' }
           end
 
-          it { is_expected.to raise_error(Puppet::PreformattedError, %r{Evaluation Error: Error while evaluating a Resource Statement}) } 
+          it { is_expected.to raise_error(Puppet::PreformattedError, %r{Evaluation Error: Error while evaluating a Resource Statement}) }
         end
         context 'when a boolean' do
           let(:params) do
@@ -129,7 +129,6 @@ describe 'managedmac::softwareupdate', type: 'class' do
           end
 
           it { is_expected.to compile.with_all_deps }
-
         end
         context 'when not a boolean' do
           let(:params) do
@@ -234,7 +233,6 @@ describe 'managedmac::softwareupdate', type: 'class' do
           }
         end
       end
-
     end
   end
 end

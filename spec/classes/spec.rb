@@ -1,4 +1,4 @@
-#TODO reinstate test
+# TODO: reinstate test
 require 'spec_helper'
 
 describe 'managedmac', type: 'class' do
