@@ -99,63 +99,24 @@
 # Copyright 2015 SFU, unless otherwise noted.
 #
 class managedmac::softwareupdate (
-  $catalog_url                    = undef,
-  $allow_pre_release_installation = undef,
-  $automatic_update_check         = undef,
-  $auto_update_apps               = undef,
-  $automatic_download             = undef,
-  $config_data_install            = undef,
-  $critical_update_install        = undef,
-  $auto_update_restart_required   = undef,) {
-  unless $allow_pre_release_installation == undef {
-    validate_bool($allow_pre_release_installation)
-  }
+  Optional[Stdlib::HTTPUrl] $catalog_url            = undef,
+  Optional[Boolean] $allow_pre_release_installation = undef,
+  Optional[Boolean] $automatic_update_check         = undef,
+  Optional[Boolean] $auto_update_apps               = undef,
+  Optional[Boolean] $automatic_download             = undef,
+  Optional[Boolean] $config_data_install            = undef,
+  Optional[Boolean] $critical_update_install        = undef,
+  Optional[Boolean] $auto_update_restart_required   = undef,
+  ) {
 
-  unless $automatic_update_check == undef {
-    validate_bool($automatic_update_check)
-  }
+  $autoupdate_plist_path =
+    lookup('managedmac::softwareupdate::autoupdate_plist_path')
+      |$key|
+        { "Could not find a value for key '${key}', please configure it in your hiera data" }
 
-  unless empty($catalog_url) {
-    validate_re($catalog_url, '\Ahttps?:\/\/(-*\w+-*(\.|-))+-*\w+-*\/')
-  }
-
-  unless $automatic_download == undef {
-    validate_bool($automatic_download)
-  }
-
-  unless $auto_update_apps == undef {
-    validate_bool($auto_update_apps)
-  }
-
-  unless $config_data_install == undef {
-    validate_bool($config_data_install)
-  }
-
-  unless $critical_update_install == undef {
-    validate_bool($critical_update_install)
-  }
-
-  unless $auto_update_restart_required == undef {
-    validate_bool($auto_update_restart_required)
-  }
-
-  $store_plist_content = {
-    'AutoUpdate' => $auto_update_apps,
-  }
-
-  $commerce_plist_content = {
+  $autoupdate_plist_content = {
     'AutoUpdate'                => $auto_update_apps,
     'AutoUpdateRestartRequired' => $auto_update_restart_required,
-  }
-
-  $autoupdate_plist_path = $::macosx_productversion_major ? {
-    '10.9'  => '/Library/Preferences/com.apple.storeagent.plist',
-    default => '/Library/Preferences/com.apple.commerce.plist',
-  }
-
-  $autoupdate_plist_content = $::macosx_productversion_major ? {
-    '10.9'  => $store_plist_content,
-    default => $commerce_plist_content,
   }
 
   $autoupdate_plist_ensure = compact_hash($autoupdate_plist_content)

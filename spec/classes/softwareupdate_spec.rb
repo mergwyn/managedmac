@@ -11,7 +11,7 @@ describe 'managedmac::softwareupdate', type: 'class' do
       context 'when setting $catalog_url' do
         context 'when undef' do
           let(:params) do
-            { catalog_url: '' }
+            { catalog_url: :undef }
           end
 
           it {
@@ -24,7 +24,7 @@ describe 'managedmac::softwareupdate', type: 'class' do
             { catalog_url: 'foo' }
           end
 
-          it { is_expected.to raise_error(Puppet::Error, %r{does not match}) }
+          it { is_expected.to raise_error(Puppet::PreformattedError, %r{Evaluation Error: Error while evaluating a Resource Statement}) }
         end
         context 'when a URL' do
           let(:params) do
@@ -41,7 +41,7 @@ describe 'managedmac::softwareupdate', type: 'class' do
       context 'when setting $allow_pre_release_installation' do
         context 'when undef' do
           let(:params) do
-            { allow_pre_release_installation: '' }
+            { allow_pre_release_installation: :undef }
           end
 
           it {
@@ -54,7 +54,7 @@ describe 'managedmac::softwareupdate', type: 'class' do
             { allow_pre_release_installation: 'foo' }
           end
 
-          it { is_expected.to raise_error(Puppet::Error, %r{not a boolean}) }
+          it { is_expected.to raise_error(Puppet::PreformattedError, %r{Evaluation Error: Error while evaluating a Resource Statement}) }
         end
         context 'when a Boolean' do
           let(:params) do
@@ -71,25 +71,25 @@ describe 'managedmac::softwareupdate', type: 'class' do
       context 'when setting $automatic_update_check' do
         context 'when a undef' do
           let(:params) do
-            { automatic_update_check: '' }
+            { automatic_update_check: :undef }
           end
 
-          it { is_expected.not_to contain_propertylist(asus_plist) }
+          it { is_expected.to compile.with_all_deps }
         end
         context 'when not a boolean' do
           let(:params) do
             { automatic_update_check: 'foo' }
           end
 
-          it { is_expected.to raise_error(Puppet::Error, %r{not a boolean}) }
+          it { is_expected.to raise_error(Puppet::PreformattedError, %r{Evaluation Error: Error while evaluating a Resource Statement}) }
         end
         context 'when a boolean' do
           let(:params) do
             { automatic_update_check: true }
           end
-
+          
           it {
-            is_expected.to contain_propertylist(asus_plist)
+            is_expected.to contain_property_list(asus_plist)
               .with_ensure('present')
           }
         end
@@ -98,17 +98,17 @@ describe 'managedmac::softwareupdate', type: 'class' do
       context 'when setting $automatic_download' do
         context 'when a undef' do
           let(:params) do
-            { automatic_download: '' }
+            { automatic_download: :undef }
           end
 
-          it { is_expected.not_to contain_propertylist(asus_plist) }
+          it { is_expected.to compile.with_all_deps }
         end
         context 'when not a boolean' do
           let(:params) do
             { automatic_download: 'foo' }
           end
 
-          it { is_expected.to raise_error(Puppet::Error, %r{not a boolean}) }
+          it { is_expected.to raise_error(Puppet::PreformattedError, %r{Evaluation Error: Error while evaluating a Resource Statement}) } 
         end
         context 'when a boolean' do
           let(:params) do
@@ -116,7 +116,7 @@ describe 'managedmac::softwareupdate', type: 'class' do
           end
 
           it {
-            is_expected.to contain_propertylist(asus_plist)
+            is_expected.to contain_property_list(asus_plist)
               .with_ensure('present')
           }
         end
@@ -125,17 +125,18 @@ describe 'managedmac::softwareupdate', type: 'class' do
       context 'when setting $config_data_install' do
         context 'when a undef' do
           let(:params) do
-            { config_data_install: '' }
+            { config_data_install: :undef }
           end
 
-          it { is_expected.not_to contain_propertylist(asus_plist) }
+          it { is_expected.to compile.with_all_deps }
+
         end
         context 'when not a boolean' do
           let(:params) do
             { config_data_install: 'foo' }
           end
 
-          it { is_expected.to raise_error(Puppet::Error, %r{not a boolean}) }
+          it { is_expected.to raise_error(Puppet::PreformattedError, %r{Evaluation Error: Error while evaluating a Resource Statement}) }
         end
         context 'when a boolean' do
           let(:params) do
@@ -143,7 +144,7 @@ describe 'managedmac::softwareupdate', type: 'class' do
           end
 
           it {
-            is_expected.to contain_propertylist(asus_plist)
+            is_expected.to contain_property_list(asus_plist)
               .with_ensure('present')
           }
         end
@@ -152,17 +153,17 @@ describe 'managedmac::softwareupdate', type: 'class' do
       context 'when setting $critical_update_install' do
         context 'when a undef' do
           let(:params) do
-            { critical_update_install: '' }
+            { critical_update_install: :undef }
           end
 
-          it { is_expected.not_to contain_propertylist(asus_plist) }
+          it { is_expected.to compile.with_all_deps }
         end
         context 'when not a boolean' do
           let(:params) do
             { critical_update_install: 'foo' }
           end
 
-          it { is_expected.to raise_error(Puppet::Error, %r{not a boolean}) }
+          it { is_expected.to raise_error(Puppet::PreformattedError, %r{Evaluation Error: Error while evaluating a Resource Statement}) }
         end
         context 'when a boolean' do
           let(:params) do
@@ -170,91 +171,70 @@ describe 'managedmac::softwareupdate', type: 'class' do
           end
 
           it {
-            is_expected.to contain_propertylist(asus_plist)
+            is_expected.to contain_property_list(asus_plist)
               .with_ensure('present')
           }
         end
       end
 
-      os_specific_mappings = {
-        '10.9'  => '/Library/Preferences/com.apple.storeagent.plist',
-        '10.10' => '/Library/Preferences/com.apple.commerce.plist',
-      }
+      describe '$auto_update_apps' do
+        let(:commerce_plist) { '/Library/Preferences/com.apple.commerce.plist' }
 
-      os_specific_mappings.each do |os_rev, plist|
-        context "on #{os_rev}" do
-          let(:facts)         { { macosx_productversion_major: os_rev } }
-          let(:store_plist)   { plist }
-
-          describe '$auto_update_apps' do
-            context 'when undef' do
-              let(:params) do
-                { auto_update_apps: '' }
-              end
-
-              it { is_expected.not_to contain_propertylist(store_plist) }
-            end
-            context 'when not a boolean' do
-              let(:params) do
-                { auto_update_apps: 'foo' }
-              end
-
-              it { is_expected.to raise_error(Puppet::Error, %r{not a boolean}) }
-            end
-            context 'when a boolean' do
-              let(:params) do
-                { auto_update_apps: true }
-              end
-
-              it {
-                is_expected.to contain_propertylist(store_plist)
-                  .with_ensure('present')
-              }
-            end
+        context 'when undef' do
+          let(:params) do
+            { auto_update_apps: :undef }
           end
 
-          if os_rev == '10.9'
-
-            describe '$auto_update_restart_required' do
-              let(:params) do
-                { auto_update_restart_required: true }
-              end
-
-              it { is_expected.not_to contain_propertylist(store_plist) }
-            end
-
-          else
-
-            describe '$auto_update_restart_required' do
-              context 'when undef' do
-                let(:params) do
-                  { auto_update_restart_required: '' }
-                end
-
-                it { is_expected.not_to contain_propertylist(store_plist) }
-              end
-              context 'when not a boolean' do
-                let(:params) do
-                  { auto_update_restart_required: 'foo' }
-                end
-
-                it { is_expected.to raise_error(Puppet::Error, %r{not a boolean}) }
-              end
-              context 'when a boolean' do
-                let(:params) do
-                  { auto_update_restart_required: true }
-                end
-
-                it {
-                  is_expected.to contain_propertylist(store_plist)
-                    .with_ensure('present')
-                }
-              end
-            end
-
+          it { is_expected.to compile.with_all_deps }
+        end
+        context 'when not a boolean' do
+          let(:params) do
+            { auto_update_apps: 'foo' }
           end
+
+          it { is_expected.to raise_error(Puppet::PreformattedError, %r{Evaluation Error: Error while evaluating a Resource Statement}) }
+        end
+        context 'when a boolean' do
+          let(:params) do
+            { auto_update_apps: true }
+          end
+
+          it {
+            is_expected.to contain_property_list(commerce_plist)
+              .with_ensure('present')
+          }
         end
       end
+
+      describe '$auto_update_restart_required' do
+        let(:commerce_plist) { '/Library/Preferences/com.apple.commerce.plist' }
+
+        context 'when undef' do
+          let(:params) do
+            { auto_update_restart_required: :undef }
+          end
+
+          it { is_expected.to compile.with_all_deps }
+        end
+        context 'when not a boolean' do
+          let(:params) do
+            { auto_update_restart_required: 'foo' }
+          end
+
+          it { is_expected.to raise_error(Puppet::PreformattedError, %r{Evaluation Error: Error while evaluating a Resource Statement}) }
+        end
+        context 'when a boolean' do
+          let(:params) do
+            { auto_update_restart_required: true }
+          end
+
+          it {
+            is_expected.to contain_property_list(commerce_plist)
+              .with_ensure('present')
+          }
+        end
+      end
+
     end
   end
 end
