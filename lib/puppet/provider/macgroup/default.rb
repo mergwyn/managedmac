@@ -2,20 +2,18 @@ require 'cfpropertylist'
 require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'provider', 'mobileconfig'))
 
 Puppet::Type.type(:macgroup).provide(:default) do
-
-  defaultfor :operatingsystem  => :darwin
-  commands   :dscl          => '/usr/bin/dscl'
-  commands   :dsmemberutil  => '/usr/bin/dsmemberutil'
-  commands   :dseditgroup   => '/usr/sbin/dseditgroup'
+  defaultfor operatingsystem: :darwin
+  commands   dscl: '/usr/bin/dscl'
+  commands   dsmemberutil: '/usr/bin/dsmemberutil'
+  commands   dseditgroup: '/usr/sbin/dseditgroup'
 
   mk_resource_methods
 
-  GROUPS_ROOT  = '/private/var/db/dslocal/nodes/Default/groups'
+  GROUPS_ROOT = '/private/var/db/dslocal/nodes/Default/groups'.freeze
 
   class << self
-
     def instances
-      list_all_groups.collect do |group|
+      list_all_groups.map do |group|
         group_properties = get_resource_properties(group)
         new(group_properties)
       end
@@ -24,7 +22,7 @@ Puppet::Type.type(:macgroup).provide(:default) do
     # Puppet MAGIC
     def prefetch(resources)
       instances.each do |prov|
-        if resource = resources[prov.name]
+        if resource = resources[prov.name] # rubocop:disable Lint/AssignmentInCondition
           resource.provider = prov
         end
       end
@@ -32,7 +30,7 @@ Puppet::Type.type(:macgroup).provide(:default) do
 
     def list_all_groups
       file_list = Dir.glob("#{GROUPS_ROOT}/*.plist")
-      file_list.collect do |file|
+      file_list.map do |file|
         parse_propertylist(file)
       end
     end
@@ -41,28 +39,26 @@ Puppet::Type.type(:macgroup).provide(:default) do
     def get_resource_properties(dict)
       return {} if dict.nil?
 
-      param_keys = [ :name, :gid, :strict, :users, :nestedgroups,
-        :realname, :comment, :ensure, ]
-      dict.inject({}) do |memo,(k,v)|
+      param_keys = [:name, :gid, :strict, :users, :nestedgroups,
+                    :realname, :comment, :ensure]
+      dict.each_with_object({}) do |(k, v), memo|
         key = k.to_sym
         if param_keys.member? key
           memo[key] = [:users, :nestedgroups].member?(key) ? v : v.first
         end
         memo[:ensure] = :present
-        memo
       end
     end
 
     # Parse a plist and return a Ruby object
     def parse_propertylist(file)
-      plist = CFPropertyList::List.new(:file => file)
+      plist = CFPropertyList::List.new(file: file)
       raise Puppet::Error, "Cannot parse: #{file}" if plist.nil?
       CFPropertyList.native_types(plist.value)
     end
-
   end
 
-  def initialize(value={})
+  def initialize(value = {})
     super(value)
     @property_flush = {}
     @dslocal_root = '/Local/Default'
@@ -97,16 +93,16 @@ Puppet::Type.type(:macgroup).provide(:default) do
 
     unique_members = desired_state.uniq
 
-    desired_state.detect do |e|
-      if desired_state.count(e) > 1
-        Puppet::Util::Warnings.warnonce(
-          "Macgroup: duplicate group specified! #{e}. Ignoring...")
-      end
+    desired_state.find do |e|
+      next unless desired_state.count(e) > 1
+      Puppet::Util::Warnings.warnonce(
+        "Macgroup: duplicate group specified! #{e}. Ignoring...",
+      )
     end
 
     name = @resource[:name]
     args = [@dslocal_root, 'create', "/Groups/#{name}", type.to_s,
-      *unique_members]
+            *unique_members]
 
     dscl(args)
   end
@@ -114,7 +110,6 @@ Puppet::Type.type(:macgroup).provide(:default) do
   # Provider Helper method
   # Create the group OR destroy it
   def manage_group
-
     name         = @resource[:name]
     comment      = @resource[:comment]  || @property_hash[:comment]
     realname     = @resource[:realname] || @property_hash[:realname]
@@ -133,7 +128,7 @@ Puppet::Type.type(:macgroup).provide(:default) do
       op = :edit
       begin
         dseditgroup([cmd_args, 'read', name].flatten)
-      rescue Puppet::ExecutionFailure => e
+      rescue Puppet::ExecutionFailure => _e
         op = :create
       end
       cmd_args << op
@@ -146,19 +141,18 @@ Puppet::Type.type(:macgroup).provide(:default) do
       # good thing. Probably.
       if gid
         unless gid.to_i == @original_properties[:gid].to_i
-          cmd_args += ['-i', "#{gid}"]
+          cmd_args += ['-i', gid.to_s]
         end
       end
 
-      cmd_args += ['-r', "#{realname}" ] if realname
-      cmd_args += ['-c', "#{comment}"  ] if comment
+      cmd_args += ['-r', realname.to_s] if realname
+      cmd_args += ['-c', comment.to_s] if comment
       cmd_args << name
 
       dseditgroup(cmd_args)
       update_membership(:users)        if users
       update_membership(:nestedgroups) if nestedgroups
     end
-
   end
 
   # Puppet MAGIC
@@ -167,7 +161,6 @@ Puppet::Type.type(:macgroup).provide(:default) do
   # (and synchronization needs to occur).
   # As per Shit Gary Says: http://bit.ly/1j9ou3Q
   def flush
-
     # Do what needs to be done
     manage_group
 
@@ -181,5 +174,4 @@ Puppet::Type.type(:macgroup).provide(:default) do
 
     @property_hash = self.class.get_resource_properties(this_group)
   end
-
 end

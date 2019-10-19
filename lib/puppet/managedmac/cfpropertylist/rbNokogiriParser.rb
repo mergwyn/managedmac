@@ -2,7 +2,7 @@
 
 require 'nokogiri'
 
-module CFPropertyList
+module CFPropertyList # rubocop:disable Style/ClassAndModuleChildren
   # XML parser
   class NokogiriXMLParser < ParserInterface
     # read a XML file
@@ -11,10 +11,10 @@ module CFPropertyList
     # * :data - The data to parse
     def load(opts)
       doc = nil
-      if(opts.has_key?(:file)) then
-        File.open(opts[:file], "rb") { |fd| doc = Nokogiri::XML::Document.parse(fd, nil, nil, Nokogiri::XML::ParseOptions::NOBLANKS|Nokogiri::XML::ParseOptions::NOENT) }
+      if opts.key?(:file)
+        File.open(opts[:file], 'rb') { |fd| doc = Nokogiri::XML::Document.parse(fd, nil, nil, Nokogiri::XML::ParseOptions::NOBLANKS | Nokogiri::XML::ParseOptions::NOENT) }
       else
-        doc = Nokogiri::XML::Document.parse(opts[:data], nil, nil, Nokogiri::XML::ParseOptions::NOBLANKS|Nokogiri::XML::ParseOptions::NOENT)
+        doc = Nokogiri::XML::Document.parse(opts[:data], nil, nil, Nokogiri::XML::ParseOptions::NOBLANKS | Nokogiri::XML::ParseOptions::NOENT)
       end
 
       if doc
@@ -22,16 +22,16 @@ module CFPropertyList
         return import_xml(root)
       end
     rescue Nokogiri::XML::SyntaxError => e
-      raise CFFormatError.new('invalid XML: ' + e.message)
+      raise CFFormatError, 'invalid XML: ' + e.message
     end
 
     # serialize CFPropertyList object to XML
     # opts = {}:: Specify options: :formatted - Use indention and line breaks
-    def to_str(opts={})
+    def to_str(opts = {})
       doc = Nokogiri::XML::Document.new
       @doc = doc
 
-      doc.root = doc.create_element 'plist', :version => '1.0'
+      doc.root = doc.create_element 'plist', version: '1.0'
       doc.encoding = 'UTF-8'
 
       doc.root << opts[:root].to_xml(self)
@@ -40,20 +40,20 @@ module CFPropertyList
       s_opts = Nokogiri::XML::Node::SaveOptions::AS_XML
       s_opts |= Nokogiri::XML::Node::SaveOptions::FORMAT if opts[:formatted]
 
-      str = doc.serialize(:save_with => s_opts)
-      str1 = String.new
+      str = doc.serialize(save_with: s_opts)
+      str1 = ''
       first = false
       str.each_line do |line|
         str1 << line
-        unless(first) then
-          str1 << "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n" if line =~ /^\s*<\?xml/
+        unless first
+          str1 << "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n" if line =~ %r{^\s*<\?xml}
         end
 
         first = true
       end
 
       str1.force_encoding('UTF-8') if str1.respond_to?(:force_encoding)
-      return str1
+      str1
     end
 
     def new_node(name)
@@ -73,10 +73,10 @@ module CFPropertyList
     # get the value of a DOM node
     def get_value(n)
       content = if n.children.empty?
-        n.content
-      else
-        n.children.first.content
-      end
+                  n.content
+                else
+                  n.children.first.content
+                end
 
       content.force_encoding('UTF-8') if content.respond_to?(:force_encoding)
       content
@@ -88,32 +88,34 @@ module CFPropertyList
 
       case node.name
       when 'dict'
-        hsh = Hash.new
+        hsh = {}
         key = nil
         children = node.children
 
-        unless children.empty? then
+        unless children.empty?
           children.each do |n|
             next if n.text? # avoid a bug of libxml
             next if n.comment?
 
-            if n.name == "key" then
+            # rubocop:disable Metrics/BlockNesting
+            if n.name == 'key'
               key = get_value(n)
             else
-              raise CFFormatError.new("Format error!") if key.nil?
+              raise CFFormatError, 'Format error!' if key.nil?
               hsh[key] = import_xml(n)
               key = nil
             end
+            # end rubocop:disable
           end
         end
 
         ret = CFDictionary.new(hsh)
 
       when 'array'
-        ary = Array.new
+        ary = []
         children = node.children
 
-        unless children.empty? then
+        unless children.empty?
           children.each do |n|
             next if n.text? # avoid a bug of libxml
             next if n.comment?
@@ -139,7 +141,7 @@ module CFPropertyList
         ret = CFDate.new(CFDate.parse_date(get_value(node)))
       end
 
-      return ret
+      ret
     end
   end
 end

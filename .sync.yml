@@ -1,0 +1,35 @@
+---
+appveyor.yml:
+  delete: true
+.gitlab-ci.yml:
+  delete: true
+.vscode/extensions.json:
+  delete: true
+.travis.yml:
+  notifications:
+    email:
+      recipients:
+      on_success: change # default: change
+      on_failure: always # default: always
+Rakefile:
+  default_disabled_lint_checks:
+    - 'relative'
+    - 'variable_is_lowercase'
+Gemfile:
+  required:
+    ':test':
+      - gem: CFPropertyList
+        version: '>=2.2.7'
+.rubocop.yml:
+  default_configs:
+    Style/PredicateName:
+      NameWhitelist:
+        - is_to_s
+    Style/FileName:
+      Enabled: false
+spec/spec_helper.rb:
+  coverage_report: true
+  mock_with: ':rspec'
+  minimum_code_coverage_percentage: 0
+  strict_level: ":warning"
+  hiera_config: "hiera.yaml"

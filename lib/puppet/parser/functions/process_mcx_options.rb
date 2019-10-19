@@ -1,10 +1,10 @@
 require 'time'
 
 module Puppet::Parser::Functions
-  newfunction(:process_mcx_options, :type => :rvalue, :doc => <<-EOS
+  newfunction(:process_mcx_options, type: :rvalue, doc: <<-EOS
 Returns a com.apple.ManagedClient.preferences Payload.
     EOS
-  ) do |args|
+             ) do |args|
 
     if args.size != 5
       e = "process_mcx_options(): Wrong number of args: #{args.size} for 5"
@@ -29,8 +29,8 @@ Returns a com.apple.ManagedClient.preferences Payload.
     when TrueClass, FalseClass
       settings['com.apple.MCXBluetooth'] = {
         'Forced' => [
-          { 'mcx_preference_settings' => { 'DisableBluetooth' => true } }
-        ]
+          { 'mcx_preference_settings' => { 'DisableBluetooth' => true } },
+        ],
       }
     else
       settings.delete('com.apple.MCXBluetooth')
@@ -40,8 +40,8 @@ Returns a com.apple.ManagedClient.preferences Payload.
     when TrueClass, FalseClass
       settings['com.apple.MCXAirPort'] = {
         'Forced' => [
-          { 'mcx_preference_settings' => { 'DisableAirPort' => true } }
-        ]
+          { 'mcx_preference_settings' => { 'DisableAirPort' => true } },
+        ],
       }
     else
       settings.delete('com.apple.MCXAirPort')
@@ -50,18 +50,17 @@ Returns a com.apple.ManagedClient.preferences Payload.
     if loginitems.empty?
       settings.delete('loginwindow')
     else
-      values = loginitems.collect do |path|
+      values = loginitems.map do |path|
         Hash['Hide', false, 'Path', path]
       end
       settings['loginwindow'] = {
         'Forced' => [
           { 'mcx_preference_settings' => {
-              'AutoLaunchedApplicationDictionary-managed' => values,
-              'DisableLoginItemsSuppression'              => false,
-              'LoginUserMayAddItems'                      => true,
-            }
-          },
-        ]
+            'AutoLaunchedApplicationDictionary-managed' => values,
+            'DisableLoginItemsSuppression'              => false,
+            'LoginUserMayAddItems'                      => true,
+          } },
+        ],
       }
     end
 
@@ -74,9 +73,8 @@ Returns a com.apple.ManagedClient.preferences Payload.
               'DidSeeCloudSetup' => true,
               'LastSeenCloudProductVersion' =>
                 lookupvar('macosx_productversion_major'),
-            },
-          },
-        ]
+            } },
+        ],
       }
     else
       settings.delete('com.apple.SetupAssistant')
@@ -88,10 +86,9 @@ Returns a com.apple.ManagedClient.preferences Payload.
       settings['com.apple.systempreferences'] = {
         'Forced' => [
           { 'mcx_preference_settings' => {
-              'HiddenPreferencePanes' => hidden_preference_panes,
-            }
-          },
-        ]
+            'HiddenPreferencePanes' => hidden_preference_panes,
+          } },
+        ],
       }
     end
 
@@ -99,8 +96,7 @@ Returns a com.apple.ManagedClient.preferences Payload.
 
     # Return a PayloadContent Array
     hash = { 'PayloadType'    => 'com.apple.ManagedClient.preferences',
-             'PayloadContent' => settings,
-    }
+             'PayloadContent' => settings }
 
     [hash]
   end

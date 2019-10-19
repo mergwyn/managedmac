@@ -2,7 +2,7 @@
 
 require 'libxml'
 
-module CFPropertyList
+module CFPropertyList # rubocop:disable Style/ClassAndModuleChildren
   # XML parser
   class LibXMLParser < XMLParserInterface
     # read a XML file
@@ -12,23 +12,23 @@ module CFPropertyList
     def load(opts)
       doc = nil
 
-      if(opts.has_key?(:file)) then
-        doc = LibXML::XML::Document.file(opts[:file],:options => LibXML::XML::Parser::Options::NOBLANKS|LibXML::XML::Parser::Options::NOENT)
-      else
-        doc = LibXML::XML::Document.string(opts[:data],:options => LibXML::XML::Parser::Options::NOBLANKS|LibXML::XML::Parser::Options::NOENT)
-      end
+      doc = if opts.key?(:file)
+              LibXML::XML::Document.file(opts[:file], options: LibXML::XML::Parser::Options::NOBLANKS | LibXML::XML::Parser::Options::NOENT)
+            else
+              LibXML::XML::Document.string(opts[:data], options: LibXML::XML::Parser::Options::NOBLANKS | LibXML::XML::Parser::Options::NOENT)
+            end
 
       if doc
         root = doc.root.first
         return import_xml(root)
       end
     rescue LibXML::XML::Error => e
-      raise CFFormatError.new('invalid XML: ' + e.message)
+      raise CFFormatError, 'invalid XML: ' + e.message
     end
 
     # serialize CFPropertyList object to XML
     # opts = {}:: Specify options: :formatted - Use indention and line breaks
-    def to_str(opts={})
+    def to_str(opts = {})
       doc = LibXML::XML::Document.new
 
       doc.root = LibXML::XML::Node.new('plist')
@@ -38,20 +38,20 @@ module CFPropertyList
       doc.root << opts[:root].to_xml(self)
 
       # ugly hack, but there's no other possibility I know
-      str = doc.to_s(:indent => opts[:formatted])
-      str1 = String.new
+      str = doc.to_s(indent: opts[:formatted])
+      str1 = ''
       first = false
       str.each_line do |line|
         str1 << line
-        unless(first) then
-          str1 << "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n" if line =~ /^\s*<\?xml/
+        unless first
+          str1 << "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n" if line =~ %r{^\s*<\?xml}
         end
 
         first = true
       end
 
       str1.force_encoding('UTF-8') if str1.respond_to?(:force_encoding)
-      return str1
+      str1
     end
 
     def new_node(name)
@@ -71,10 +71,10 @@ module CFPropertyList
     # get the value of a DOM node
     def get_value(n)
       content = if n.children?
-        n.first.content
-      else
-        n.content
-      end
+                  n.first.content
+                else
+                  n.content
+                end
 
       content.force_encoding('UTF-8') if content.respond_to?(:force_encoding)
       content
@@ -86,30 +86,32 @@ module CFPropertyList
 
       case node.name
       when 'dict'
-        hsh = Hash.new
+        hsh = {}
         key = nil
 
-        if node.children? then
+        if node.children?
           node.children.each do |n|
             next if n.text? # avoid a bug of libxml
             next if n.comment?
 
-            if n.name == "key" then
+            # rubocop:disable Metrics/BlockNesting
+            if n.name == 'key'
               key = get_value(n)
             else
-              raise CFFormatError.new("Format error!") if key.nil?
+              raise CFFormatError, 'Format error!' if key.nil?
               hsh[key] = import_xml(n)
               key = nil
             end
+            # end rubocop:disable
           end
         end
 
         ret = CFDictionary.new(hsh)
 
       when 'array'
-        ary = Array.new
+        ary = []
 
-        if node.children? then
+        if node.children?
           node.children.each do |n|
             next if n.text? # avoid a bug of libxml
             next if n.comment?
@@ -135,7 +137,7 @@ module CFPropertyList
         ret = CFDate.new(CFDate.parse_date(get_value(node)))
       end
 
-      return ret
+      ret
     end
   end
 end

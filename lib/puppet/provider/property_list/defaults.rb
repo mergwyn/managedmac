@@ -1,14 +1,13 @@
 require File.dirname(__FILE__)
 
 Puppet::Type.type(:property_list).provide(:defaults,
-  :parent => Puppet::Provider::PropertyList) do
+                                          parent: Puppet::Provider::PropertyList) do
 
-  commands :defaults => '/usr/bin/defaults'
+  commands defaults: '/usr/bin/defaults'
 
   mk_resource_methods
 
   class << self
-
     # Override the write_plist method
     # In order to get preferences to sync, we need to use `defaults` or
     # HUP cfprefsd. Using defaults is preferred, and we trigger a sync
@@ -19,23 +18,20 @@ Puppet::Type.type(:property_list).provide(:defaults,
     def write_plist(path, content, format)
       super
       flag_map = {
-        String     => '-string',
-        Fixnum     => '-integer',
+        String => '-string',
+        Integer => '-integer',
         Float      => '-float',
         TrueClass  => '-bool',
         FalseClass => '-bool',
       }
       content.each do |key, value|
         case value
-        when String, Fixnum, Float, TrueClass, FalseClass
+        when String, Integer, Float, TrueClass, FalseClass
           flag = flag_map[value.class]
           return defaults 'write', path, key, flag, value
-        else
         end
       end
       system('/usr/bin/killall cfprefsd')
     end
-
   end
-
 end

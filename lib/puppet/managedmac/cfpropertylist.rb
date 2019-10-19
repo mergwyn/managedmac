@@ -2,5 +2,4 @@
 
 require 'cfpropertylist/rbCFPropertyList'
 
-
 # eof
