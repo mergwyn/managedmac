@@ -1,12 +1,12 @@
 {
-  "name": "sfu-managedmac",
-  "version": "0.8.1",
+  "name": "mergwyn-managedmac",
+  "version": "0.9.0",
   "author": "Brian Warsing <bcw@sfu.ca>",
   "summary": "Comprehensive OS X Configuration and Management",
   "license": "Apache-2.0",
-  "source": "https://github.com/dayglojesus/managedmac",
-  "project_page": "https://github.com/dayglojesus/managedmac",
-  "issues_url": "https://github.com/dayglojesus/managedmac/issues",
+  "source": "https://github.com/mergwyn/mergwyn-managedmac",
+  "project_page": "https://github.com/mergwyn/mergwyn-managedmac",
+  "issues_url": "https://github.com/mergwyn/mergwyn-managedmac/issues",
   "dependencies": [
     {
       "name": "puppetlabs/stdlib",
