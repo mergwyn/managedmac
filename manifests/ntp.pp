@@ -69,6 +69,7 @@ class managedmac::ntp (
 
     $ntp_conf_default  = 'server time.apple.com'
     $template = @(EOF/sn)
+    # This file is maintained by PUPPET - do not modify
     <%= (@servers.collect {|x| ['server', x].join('\s') }).join('\n') %>
     | EOF
     $ntp_conf_template = inline_template($template)
