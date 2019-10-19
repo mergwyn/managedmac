@@ -3,13 +3,22 @@
 All notable changes to this project will be documented in this file.
 
 ## 0.8.2
+- Fix missing trailing newline ntp.conf and add warning comment
 - TODO
 
 ## 0.8.1
-- TODO
+- Convert to pdk
+- Update for timed over ntpd
+- Implement data-in-modules
+- Only support 10.12-10.14 (16-18)
+- Updagrde for puppet 6
+- Add parameter typing
+- Fix unit tests
+- Fix lint errors
 
 ## 0.8.0
-- TODO
+- Merge puppet4.5 branch from https://github.com/henrydobson/managedmac
+- adminhostinfo addition for loginwindow and support for puppet 4.5+
 
 ## 0.7.3
 - IMPORTANT: requires Puppet 3.8.3
