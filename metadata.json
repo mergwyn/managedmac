@@ -1,6 +1,6 @@
 {
   "name": "mergwyn-managedmac",
-  "version": "0.9.0",
+  "version": "0.8.1",
   "author": "Brian Warsing <bcw@sfu.ca>",
   "summary": "Comprehensive OS X Configuration and Management",
   "license": "Apache-2.0",
