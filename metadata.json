@@ -1,33 +1,40 @@
 {
-  "name": "sfu-managedmac",
-  "version": "0.8.0",
+  "name": "mergwyn-managedmac",
+  "version": "0.8.1",
   "author": "Brian Warsing <bcw@sfu.ca>",
   "summary": "Comprehensive OS X Configuration and Management",
-  "license": "Apache License, Version 2.0",
-  "source": "https://github.com/dayglojesus/managedmac",
-  "project_page": "https://github.com/dayglojesus/managedmac",
-  "issues_url": "https://github.com/dayglojesus/managedmac/issues",
-  "description": "A giant Puppet module for OS X. Abstracts all the things.",
+  "license": "Apache-2.0",
+  "source": "https://github.com/mergwyn/mergwyn-managedmac",
+  "project_page": "https://github.com/mergwyn/mergwyn-managedmac",
+  "issues_url": "https://github.com/mergwyn/mergwyn-managedmac/issues",
   "dependencies": [
     {
       "name": "puppetlabs/stdlib",
-      "version_requirement": ">= 4.1.0"
+      "version_requirement": ">= 4.1.0 <7.0.0"
+    },
+    {
+      "name": "puppetlabs/cron_core",
+      "version_requirement": ">= 1.0.0 <2.0.0"
     }
   ],
   "operatingsystem_support": [
     {
-       "operatingsystem": "Darwin",
-       "operatingsystemrelease": ["10.9", "10.10", "10.11"]
+      "operatingsystem": "Darwin",
+      "operatingsystemrelease": [
+        "16",
+        "17",
+        "18"
+      ]
     }
   ],
   "requirements": [
     {
-      "name": "pe",
-      "version_requirement": ">=3.8.3 <4.0.0"
-    },
-    {
       "name": "puppet",
-      "version_requirement": ">=3.8.3 <4.0.0"
+      "version_requirement": ">=5.0.0 <7.0.0"
     }
-  ]
+  ],
+  "description": "A giant Puppet module for OS X. Abstracts all the things.",
+  "pdk-version": "1.14.0",
+  "template-url": "pdk-default#1.14.0",
+  "template-ref": "1.14.0-0-g1bf3a4e"
 }

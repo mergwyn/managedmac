@@ -81,8 +81,11 @@
 #
 class managedmac::mcx (
 
-  $bluetooth                  = undef,
-  $wifi                       = undef,
+# TODO create a type for Optional[Variant[Boolean,Enum['true','on','enable','false','off','disable']]]
+  # lint:ignore:quoted_booleans
+  Optional[Variant[Boolean,Enum['true','on','enable','false','off','disable']]] $bluetooth = undef,
+  Optional[Variant[Boolean,Enum['true','on','enable','false','off','disable']]] $wifi = undef,
+  # lint:endignore
   $loginitems                 = [],
   $suppress_icloud_setup      = undef,
   $hidden_preference_panes    = [],
@@ -91,7 +94,9 @@ class managedmac::mcx (
 
   $bluetooth_state = $bluetooth ? {
     /on|true|enable/    => false,
+    true                => false,
     /off|false|disable/ => true,
+    false               => true,
     undef               => undef,
     default             => "Parameter Error: invalid value for :bluetooth, \
 ${bluetooth}",
@@ -99,18 +104,21 @@ ${bluetooth}",
 
   $wifi_state = $wifi ? {
     /on|true|enable/    => false,
+    true                => false,
     /off|false|disable/ => true,
+    false               => true,
     undef               => undef,
     default             => "Parameter Error: invalid value for :wifi, ${wifi}",
   }
 
-  unless $bluetooth_state == undef {
-    validate_bool ($bluetooth_state)
-  }
+#TODO fix validation
+  #unless $bluetooth_state == undef {
+  #  validate_bool ($bluetooth_state)
+  #}
 
-  unless $wifi_state == undef {
-    validate_bool ($wifi_state)
-  }
+  #unless $wifi_state == undef {
+  #  validate_bool ($wifi_state)
+  #}
 
   validate_array ($loginitems)
 

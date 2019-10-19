@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:remotemanagement) do
-  @doc = %q{Manage Mac OS X Apple Remote Desktop client settings.
+  @doc = "Manage Mac OS X Apple Remote Desktop client settings.
     remotemanagement { 'apple_remote_desktop':
       ensure            => 'running',
       allow_all_users   => false,
@@ -28,25 +28,25 @@ Puppet::Type.newtype(:remotemanagement) do
 
     FFFFFFFF80000002 -2147483646 control and observe don't show when observing
     FFFFFFFFC00000FF -1073741569 all enabled
-    }
+    "
 
   def munge_boolean(value)
     case value
-    when true, "true", :true
+    when true, 'true', :true
       true
-    when false, "false", :false
+    when false, 'false', :false
       false
     else
-      fail("munge_boolean only takes booleans")
+      raise('munge_boolean only takes booleans')
     end
   end
 
   ensurable do
-    newvalue(:stopped, :event => :service_stopped) do
+    newvalue(:stopped, event: :service_stopped) do
       provider.stop
     end
 
-    newvalue(:running, :event => :service_started) do
+    newvalue(:running, event: :service_started) do
       provider.start
     end
 
@@ -56,13 +56,13 @@ Puppet::Type.newtype(:remotemanagement) do
   end
 
   newparam(:name) do
-    desc "Name of the setup."
+    desc 'Name of the setup.'
     isnamevar
     defaultto 'apple_remote_desktop'
   end
 
   newproperty(:allow_all_users) do
-    desc "Whether to enable ARD access for ALL local users of the machine."
+    desc 'Whether to enable ARD access for ALL local users of the machine.'
 
     munge do |value|
       @resource.munge_boolean(value)
@@ -73,7 +73,7 @@ Puppet::Type.newtype(:remotemanagement) do
   end
 
   newproperty(:all_users_privs) do
-    desc "The privleges to use when the :allow_all_users bool is set to true."
+    desc 'The privleges to use when the :allow_all_users bool is set to true.'
 
     munge do |value|
       value.to_s
@@ -92,7 +92,7 @@ Puppet::Type.newtype(:remotemanagement) do
   end
 
   newproperty(:enable_dir_logins) do
-    desc "Allow the special directory groups to be used."
+    desc 'Allow the special directory groups to be used.'
 
     munge do |value|
       @resource.munge_boolean(value)
@@ -102,22 +102,22 @@ Puppet::Type.newtype(:remotemanagement) do
     defaultto false
   end
 
-  newproperty(:allowed_dir_groups, :array_matching => :all) do
-    desc "A list of directory groups allowed to access to the service."
+  newproperty(:allowed_dir_groups, array_matching: :all) do
+    desc 'A list of directory groups allowed to access to the service.'
 
     def insync?(is)
       if is == :absent
-        [] == should
+        should == []
       else
         is.sort == should.sort
       end
     end
 
-    defaultto { return Array.new }
+    defaultto { return [] }
   end
 
   newproperty(:enable_legacy_vnc) do
-    desc "Enable or disable legacy VNC support. Just a bad idea all around."
+    desc 'Enable or disable legacy VNC support. Just a bad idea all around.'
 
     munge do |value|
       @resource.munge_boolean(value)
@@ -145,7 +145,7 @@ Puppet::Type.newtype(:remotemanagement) do
   end
 
   newproperty(:allow_vnc_requests) do
-    desc "Allow VNC guests to request permission?"
+    desc 'Allow VNC guests to request permission?'
 
     munge do |value|
       @resource.munge_boolean(value)
@@ -156,7 +156,7 @@ Puppet::Type.newtype(:remotemanagement) do
   end
 
   newproperty(:allow_wbem_requests) do
-    desc "Allow incoming WBEM requests over IP."
+    desc 'Allow incoming WBEM requests over IP.'
 
     munge do |value|
       @resource.munge_boolean(value)
@@ -167,10 +167,10 @@ Puppet::Type.newtype(:remotemanagement) do
   end
 
   newproperty(:users) do
-    desc "A hash containing a username to privilege mapping."
+    desc 'A hash containing a username to privilege mapping.'
 
     munge do |value|
-      value.inject({}) { |m,(k,v)| m[k.to_s] = v.to_s;m }
+      value.each_with_object({}) { |(k, v), m| m[k.to_s] = v.to_s; }
     end
 
     def insync?(is)
@@ -181,7 +181,7 @@ Puppet::Type.newtype(:remotemanagement) do
       end
     end
 
-    defaultto { return Hash.new }
+    defaultto { return {} }
   end
 
   newparam(:strict) do
@@ -195,5 +195,4 @@ Puppet::Type.newtype(:remotemanagement) do
     newvalues(true, false)
     defaultto true
   end
-
 end

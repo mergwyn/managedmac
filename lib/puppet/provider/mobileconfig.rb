@@ -3,12 +3,11 @@ require 'securerandom'
 require 'fileutils'
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'managedmac', 'common'))
 
+# Mobileconfig provider
 class Puppet::Provider::MobileConfig < Puppet::Provider
-
-  confine :operatingsystem  => :darwin
+  confine operatingsystem: :darwin
 
   class << self
-
     # Returns an Array of a provider instances for every resource discovered
     def instances
       fetch_resources(true)
@@ -17,7 +16,7 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
     # Puppet MAGIC
     def prefetch(resources)
       fetch_resources.each do |prov|
-        if resource = resources[prov.name]
+        if resource = resources[prov.name] # rubocop:disable Lint/AssignmentInCondition#
           resource.provider = prov
         end
       end
@@ -26,12 +25,12 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
     # Rather than letting #instances control what a resource looks like, def
     # a method to collect the data. This way we can choose whterh or not to
     # scrub the PayloadUUID which we now use as a checksum.
-    def fetch_resources(scrub_uuids=false)
-      all = get_installed_profiles
-      all.collect do |profile|
-        resource = get_resource_properties(profile)
+    def fetch_resources(scrub_uuids = false)
+      all = installed_profiles
+      all.map do |profile|
+        resource = resource_properties(profile)
         if scrub_uuids
-          resource[:content].collect! do |hash|
+          resource[:content].map! do |hash|
             hash.delete('PayloadUUID')
             hash
           end
@@ -43,15 +42,15 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
     # Use the profiles command to return an array containing a Hash
     # representation of each of the profiles installed
     # Returns: Array
-    def get_installed_profiles
+    def installed_profiles
       # Setup a tmp dir we can dump the installed profiles in
       dir  = Dir.mktmpdir
-      path = [dir, "profiles#{SecureRandom.hex}.plist"].join("/")
+      path = [dir, "profiles#{SecureRandom.hex}.plist"].join('/')
 
       begin
         profiles(['-P', '-o', path])
-      rescue Puppet::ExecutionFailure => e
-        raise Puppet::Error, "#mobileconfig: command returned non-zero
+      rescue Puppet::ExecutionFailure #=> e
+        raise $ERROR_INFO, Puppet::Error, "#mobileconfig: command returned non-zero #{$ERROR_INFO}
           `profiles -P -o #{path}`"
       end
 
@@ -66,8 +65,7 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
     end
 
     # Profile read from profile dump goes in, Puppet resource comes out
-    def get_resource_properties(profile)
-
+    def resource_properties(profile)
       # No profile, empty Hash
       return {} if profile.nil?
 
@@ -76,32 +74,32 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
       # They changed this key to match what it would be if it
       # were in a Payload. Yay, parity?
       removal_disallowed_key = if profile['ProfileUninstallPolicy']
-        # Mavericks
-        profile['ProfileUninstallPolicy'] == 'allowed' ? 'false' : 'true'
-      else
-        # Yosemite
-        profile['ProfileRemovalDisallowed']
-      end
+                                 # Mavericks
+                                 (profile['ProfileUninstallPolicy'] == 'allowed') ? 'false' : 'true'
+                               else
+                                 # Yosemite
+                                 profile['ProfileRemovalDisallowed']
+                               end
 
       # Prepare the content array for insertion into the resource
       content = prepare_content(profile['ProfileItems'])
 
       # Ladies and gentleman, the Puppet resource as a Hash
       {
-        :name              => profile['ProfileIdentifier'],
-        :description       => profile['ProfileDescription'],
-        :displayname       => profile['ProfileDisplayName'],
-        :organization      => profile['ProfileOrganization'],
-        :removaldisallowed => removal_disallowed_key,
-        :provider          => :mobileconfig,
-        :ensure            => :present,
-        :content           => content,
+        name: profile['ProfileIdentifier'],
+        description: profile['ProfileDescription'],
+        displayname: profile['ProfileDisplayName'],
+        organization: profile['ProfileOrganization'],
+        removaldisallowed: removal_disallowed_key,
+        provider: :mobileconfig,
+        ensure: :present,
+        content: content,
       }
     end
 
     # Formats the PayloadContent data for use the in the resource
     def prepare_content(content)
-      content.collect do |item|
+      content.map do |item|
         # Extract the PayloadContent
         settings = item.delete('PayloadContent')
 
@@ -116,7 +114,7 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
         # the correct :content no matter which provider is used. This feels
         # cheap, but it is economical and may be required by other subclasses
         # of the mobielconfig provider down the road.
-        settings.reject! { |k| k =~ /\AAD.*Flag\z/ }
+        settings.reject! { |k| k =~ %r{\AAD.*Flag\z} }
 
         item.merge settings
       end
@@ -124,14 +122,13 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
 
     # Parse a plist and return a Ruby object
     def parse_propertylist(file)
-      plist = CFPropertyList::List.new(:file => file)
+      plist = CFPropertyList::List.new(file: file)
       raise Puppet::Error, "Cannot parse: #{file}" if plist.nil?
       CFPropertyList.native_types(plist.value)
     end
-
   end
 
-  def initialize(value={})
+  def initialize(value = {})
     super(value)
     @property_flush = {}
 
@@ -171,7 +168,7 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
     # reinstall the profile.
 
     define_singleton_method(:content) do
-      if @resource[:content] and not @resource[:content].empty?
+      if @resource[:content] && !@resource[:content].empty?
         return @property_hash[:content].each_with_index.map do |hash, i|
           if hash.key?('Password')
             hash['Password'] = @resource[:content][i]['Password']
@@ -181,7 +178,6 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
       end
       @property_hash[:content] || :absent
     end
-
   end
 
   def create
@@ -235,7 +231,7 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
                   'ADRestrictDDNS',
                   'ADTrustChangePassIntervalDays',
                   'ADUseWindowsUNCPath',
-                  'ADWarnUserBeforeCreatingMA',]
+                  'ADWarnUserBeforeCreatingMA']
 
     needs_flag.each do |e|
       if payload.key?(e)
@@ -288,13 +284,13 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
   #
   def process_certificate_payload(payload)
     data = case payload['PayloadContent']
-    when CFPropertyList::Blob
-      parse_cert_data_from_blob(payload['PayloadContent'])
-    when String
-      parse_cert_data_from_string(payload['PayloadContent'])
-    else
-      raise Puppet::Error, "Invalid Certificate Data!"
-    end
+           when CFPropertyList::Blob
+             parse_cert_data_from_blob(payload['PayloadContent'])
+           when String
+             parse_cert_data_from_string(payload['PayloadContent'])
+           else
+             raise Puppet::Error, 'Invalid Certificate Data!'
+           end
     payload['PayloadContent'] = CFPropertyList::Blob.new data
     payload
   end
@@ -303,23 +299,20 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
   # - ensures required keys to each Hash
   def transform_content(content)
     return [] if content.empty?
-    content.collect! do |payload|
-
+    content.map! do |payload|
       # PayloadUUID for each Payload is modified MD5 sum of Payload itself,
       # minus any of the other ephemeral keys. We can use this to check whether
       # or not the content has been modified. Even when the Payload attributes
       # cannot be compared (ie. Password keys).
 
       payload.delete('PayloadUUID')
-      embedded_payload_uuid = ::ManagedMacCommon::content_to_uuid payload.sort
+      embedded_payload_uuid = ::ManagedMacCommon.content_to_uuid payload.sort
       embedded_payload_id   = payload['PayloadIdentifier'] || [@resource[:name],
-                                      embedded_payload_uuid].join('.')
-      payload.merge!({
-        'PayloadIdentifier' => embedded_payload_id,
-        'PayloadUUID'       => embedded_payload_uuid,
-        'PayloadEnabled'    => true,
-        'PayloadVersion'    => 1,
-      })
+                                                               embedded_payload_uuid].join('.')
+      payload.merge!('PayloadIdentifier' => embedded_payload_id,
+                     'PayloadUUID'       => embedded_payload_uuid,
+                     'PayloadEnabled'    => true,
+                     'PayloadVersion'    => 1)
 
       case payload['PayloadType']
       when 'com.apple.DirectoryService.managed'
@@ -335,21 +328,20 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
   # Provider Helper method
   # Build and install the mobileconfig OR destroy it
   def coalesce_mobileconfig
-
     if @property_flush[:ensure] == :absent
 
       # Remove the profile
       id = @resource[:name]
       begin
         profiles(['-R', '-p', id])
-      rescue Puppet::ExecutionFailure => e
-        raise Puppet::Error, "#mobileconfig: command returned
-          non-zero `profiles -R -p #{id}`"
+      rescue Puppet::ExecutionFailure #=> e
+        raise $ERROR_INFO, Puppet::Error, "#mobileconfig: command returned
+          non-zero #{$ERROR_INFO} `profiles -R -p #{id}`"
       end
 
     else
       # Create a tmp dir we can use to house the .mobileconfig
-      path = [Dir.mktmpdir, "#{SecureRandom.hex}.mobileconfig"].join("/")
+      path = [Dir.mktmpdir, "#{SecureRandom.hex}.mobileconfig"].join('/')
 
       # Transform @resource into usable Hash
       document = {
@@ -358,7 +350,7 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
         'PayloadDisplayName'       => @resource[:displayname],
         'PayloadOrganization'      => @resource[:organization],
         'PayloadRemovalDisallowed' =>
-          @resource[:removaldisallowed] == :false ? false : true,
+          (@resource[:removaldisallowed] == :false) ? false : true,
         'PayloadScope'             => 'System',
         'PayloadType'              => 'Configuration',
         'PayloadUUID'              => SecureRandom.uuid,
@@ -373,14 +365,13 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
 
       begin
         profiles(['-I', '-F', path])
-      rescue Puppet::ExecutionFailure => e
-        raise Puppet::Error, "#mobileconfig: command returned non-zero
+      rescue Puppet::ExecutionFailure #=> e
+        raise $ERROR_INFO, Puppet::Error, "#mobileconfig: command returned non-zero #{$ERROR_INFO}
           `profiles -I -F #{path}`"
       end
 
-      FileUtils.rm_rf path if File.exists? path
+      FileUtils.rm_rf path if File.exist? path
     end
-
   end
 
   # Puppet MAGIC
@@ -393,12 +384,11 @@ class Puppet::Provider::MobileConfig < Puppet::Provider
 
     # Collect the resources again once they've been changed (that way `puppet
     # resource` will show the correct values after changes have been made).
-    all_profiles = self.class.get_installed_profiles
+    all_profiles = self.class.installed_profiles
     this_profile = all_profiles.find do |profile|
       profile['ProfileIdentifier'].eql? resource[:name]
     end
 
-    @property_hash = self.class.get_resource_properties(this_profile)
+    @property_hash = self.class.resource_properties(this_profile)
   end
-
 end

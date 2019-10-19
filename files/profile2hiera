@@ -6,9 +6,9 @@ require 'json'
 require 'ostruct'
 require 'optparse'
 
-FORMATS       = [:yaml, :json]
-DEFAULTS_KEY  = 'managedmac::mobileconfigs::defaults'
-PAYLOADS_KEY  = 'managedmac::mobileconfigs::payloads'
+FORMATS       = [:yaml, :json].freeze
+DEFAULTS_KEY  = 'managedmac::mobileconfigs::defaults'.freeze
+PAYLOADS_KEY  = 'managedmac::mobileconfigs::payloads'.freeze
 FILTERED_KEYS = ['PayloadIdentifier',
                  'PayloadDescription',
                  'PayloadDisplayName',
@@ -17,12 +17,12 @@ FILTERED_KEYS = ['PayloadIdentifier',
                  'PayloadScope',
                  'PayloadEnabled',
                  'PayloadUUID',
-                 'PayloadVersion',]
+                 'PayloadVersion'].freeze
 
 # Transform PayloadContent
 def transform_content(content)
-  content.collect do |hash|
-    hash.reject do |key, value|
+  content.map do |hash|
+    hash.reject do |key, _value|
       FILTERED_KEYS.include? key
     end
   end
@@ -36,15 +36,14 @@ def transform_profile(profile)
     'description'  => profile['PayloadDescription'],
     'content'      => transform_content(profile['PayloadContent']),
   }
-  payload.delete_if { |k,v| v.nil? or v.empty? }
+  payload.delete_if { |_k, v| v.nil? || v.empty? }
   { profile ['PayloadIdentifier'] => payload }
 end
 
 # Process the supplied profiels
 def process_profiles(profiles)
-  profiles.inject({}) do |memo,p|
+  profiles.each_with_object({}) do |p, memo|
     memo.merge! transform_profile(p)
-    memo
   end
 end
 
@@ -65,11 +64,10 @@ end
 
 # Validate the format argument
 def validate_format(format)
-  unless FORMATS.include? format
-    puts "Invalid Format! \'#{format.to_s}\'"
-    output_help
-    exit 1
-  end
+  return unless FORMATS.include? format
+  puts "Invalid Format! \'#{format}\'"
+  output_help
+  exit 1
 end
 
 ###########################################
@@ -81,13 +79,13 @@ options = OpenStruct.new
 options.format = :yaml
 
 @optparse = OptionParser.new do |opts|
-  opts.banner = "Usage: profile2hiera [options]"
-  opts.on("-f", "--format [FORMAT]", "Output format, json or yaml") do |f|
+  opts.banner = 'Usage: profile2hiera [options]'
+  opts.on('-f', '--format [FORMAT]', 'Output format, json or yaml') do |f|
     f = f.to_sym
     validate_format(f)
     options.format = f
   end
-  opts.on_tail("-h", "--help", "Show this message") do
+  opts.on_tail('-h', '--help', 'Show this message') do
     puts opts
     exit
   end
@@ -99,8 +97,8 @@ end
 if pgmargs.empty?
   output_help
 else
-  profiles = ARGV.collect do |file|
-    plist = CFPropertyList::List.new(:file => file)
+  profiles = ARGV.map do |file|
+    plist = CFPropertyList::List.new(file: file)
     CFPropertyList.native_types(plist.value)
   end
   payloads = process_profiles(profiles)

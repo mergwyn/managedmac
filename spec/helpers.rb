@@ -1,9 +1,7 @@
 module Helpers
-
   def options_ntp
     { 'servers' => ['time.apple.com', 'time1.google.com'],
-      'max_offset' => 120,
-    }
+      'max_offset' => 120 }
   end
 
   def options_activedirectory
@@ -27,8 +25,7 @@ module Helpers
       'ADPacketSign'                  => true,
       'ADPacketEncrypt'               => true,
       'ADRestrictDDNS'                => 'en0',
-      'ADTrustChangePassIntervalDays' => 14,
-    }
+      'ADTrustChangePassIntervalDays' => 14 }
   end
 
   def options_softwareupdate
@@ -38,60 +35,63 @@ module Helpers
   def options_energysaver
     schedule = {
       'RepeatingPowerOff' => { 'eventtype' => 'sleep', 'time' => 1410,
-        'weekdays' => 127},
+                               'weekdays' => 127 },
       'RepeatingPowerOn'  => { 'eventtype' => 'wakepoweron', 'time' => 480,
-        'weekdays' => 127}
+                               'weekdays' => 127 },
     }
 
-    ac_power = { "Automatic Restart On Power Loss" => true,
-      "Disk Sleep Timer-boolean" => true,
-      "Display Sleep Timer" => 15,
-      "Sleep On Power Button" => false,
-      "Wake On LAN" => true,
-      "System Sleep Timer" => 30,
-    }
+    ac_power = { 'Automatic Restart On Power Loss' => true,
+                 'Disk Sleep Timer-boolean' => true,
+                 'Display Sleep Timer' => 15,
+                 'Sleep On Power Button' => false,
+                 'Wake On LAN' => true,
+                 'System Sleep Timer' => 30 }
 
-    battery_power = { "Automatic Restart On Power Loss" => true,
-      "Disk Sleep Timer-boolean" => true,
-      "Display Sleep Timer" => 15,
-      "Sleep On Power Button" => false,
-      "Wake On LAN" => true,
-      "System Sleep Timer" => 30,
-    }
+    battery_power = { 'Automatic Restart On Power Loss' => true,
+                      'Disk Sleep Timer-boolean' => true,
+                      'Display Sleep Timer' => 15,
+                      'Sleep On Power Button' => false,
+                      'Wake On LAN' => true,
+                      'System Sleep Timer' => 30 }
 
     {
       'desktop'  => { 'ACPower' => ac_power, 'Schedule' => schedule },
-      'portable' => { 'ACPower' => ac_power, 'BatteryPower' => battery_power }
+      'portable' => { 'ACPower' => ac_power, 'BatteryPower' => battery_power },
     }
   end
 
   def accounts_users
     {
       'foo' => {
-                 'ensure'     => 'present',
-                 'comment'    => 'Created by Puppet',
-                 'gid'        => 20,
-                 'groups'     => ['_appserveradm', '_appserverusr', '_lpadmin', 'admin', 'com.apple.sharepoint.group.1'],
-                 'home'       => '/Users/bar',
-                 'iterations' => 33682,
-                 'password'   => '6e849409877191dd5b28bcbda2e0619dbe7ee6c6fc30620eb2508df6cbfcf5b57cac66da5a65812aa50970510f72a45b690402325d5cb736095780ef288f5c2be85ea70a49006b94835c8bbf66445656a1f4c3f1c2ec2c89666aaace545d2b2e88de634a779b9d909b6f62e8e182d4dd843b5952fb2913bdfa6a0e824e6c3cea',
-                 'salt'       => '4b07f6938c5774751b2d794d5b18200584a0fbd1b23b62a43491f5f7aeb9e174',
-                 'shell'      => '/bin/bash',
-                 'uid'        => 501,
-               },
+        'ensure'     => 'present',
+        'comment'    => 'Created by Puppet',
+        'gid'        => 20,
+        'groups'     => ['_appserveradm', '_appserverusr', '_lpadmin', 'admin', 'com.apple.sharepoint.group.1'],
+        'home'       => '/Users/bar',
+        'iterations' => 33_682,
+        'salt'       => '4b07f6938c5774751b2d794d5b18200584a0fbd1b23b62a43491f5f7aeb9e174',
+        'shell'      => '/bin/bash',
+        'uid'        => 501,
+      },
 
       'bar' => {
-                 'ensure'     => 'present',
-                 'comment'    => 'Created by Puppet',
-                 'gid'        => 20,
-                 'groups'     => ['_appserveradm', '_appserverusr', '_lpadmin', 'admin', 'com.apple.sharepoint.group.1'],
-                 'home'       => '/Users/bar',
-                 'iterations' => 31260,
-                 'password'   => '6e849409877191dd5b28bcbda2e0619dbe7ee6c6fc30620eb2508df6cbfcf5b57cab66da5a65812aa50970510f72a45b690402325d5cb736095780ef288f5c2be85ea70a49006b94835c8bbf66445656a1f4c3f1c2ec2c89666aaace545d2b2e88de634a779b9d909b6f62e8e182d4dd843b5952fb2913bdfa6a0e824e6c3cea',
-                 'salt'       => '4b07f6938c4774751b2d794d5b18200584a0fbd1b23b62a43491f5f7aeb9e174',
-                 'shell'      => '/bin/bash',
-                 'uid'        => 502,
-               }
+        'ensure'     => 'present',
+        'comment'    => 'Created by Puppet',
+        'gid'        => 20,
+        'groups'     => ['_appserveradm', '_appserverusr', '_lpadmin', 'admin', 'com.apple.sharepoint.group.1'],
+        'home'       => '/Users/bar',
+        'iterations' => 31_260,
+        'password'   => <<-END.strip,
+                        6e849409877191dd5b28bcbda2e0619dbe7ee6c6fc30620eb2508df6cb
+                        fcf5b57cac66da5a65812aa50970510f72a45b690402325d5cb7360957
+                        80ef288f5c2be85ea70a49006b94835c8bbf66445656a1f4c3f1c2ec2c
+                        89666aaace545d2b2e88de634a779b9d909b6f62e8e182d4dd843b5952
+                        fb2913bdfa6a0e824e6c3cea
+                        END
+        'salt'       => '4b07f6938c4774751b2d794d5b18200584a0fbd1b23b62a43491f5f7aeb9e174',
+        'shell'      => '/bin/bash',
+        'uid'        => 502,
+      },
     }
   end
 
@@ -99,14 +99,14 @@ module Helpers
     {
       'foo_group' => {
         'gid'          => 554,
-        'users'        => ['root', 'nobody', 'daemon',],
-        'nestedgroups' => ['admin', 'staff',],
+        'users'        => ['root', 'nobody', 'daemon'],
+        'nestedgroups' => ['admin', 'staff'],
       },
 
       'bar_group' => {
         'gid'          => 555,
-        'users'        => ['root', 'nobody', 'daemon',],
-        'nestedgroups' => ['admin', 'staff',],
+        'users'        => ['root', 'nobody', 'daemon'],
+        'nestedgroups' => ['admin', 'staff'],
       },
 
     }
@@ -123,7 +123,7 @@ module Helpers
           'PayloadType' => 'com.apple.dock',
         },
         'displayname' => 'Managed Mac: Dock Settings',
-      }
+      },
     }
   end
 
@@ -149,7 +149,7 @@ module Helpers
         'owner'   => 'root',
         'group'   => 'admin',
         'mode'    => '0644',
-        'content' => "This is an exmaple.",
+        'content' => 'This is an exmaple.',
       },
       '/path/to/a/directory' => {
         'ensure'  => 'directory',
@@ -181,5 +181,4 @@ module Helpers
       },
     }
   end
-
 end

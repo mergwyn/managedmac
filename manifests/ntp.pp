@@ -54,10 +54,8 @@
 # Copyright 2015 SFU, unless otherwise noted.
 #
 class managedmac::ntp (
-
   $enable  = undef,
   $servers = ['time.apple.com']
-
 ) {
 
   unless $enable == undef {
@@ -65,7 +63,10 @@ class managedmac::ntp (
     validate_bool  ($enable)
     validate_array ($servers)
 
-    $ntp_service_label = 'org.ntp.ntpd'
+    $ntp_service_label = lookup('managedmac::ntp::service')
+      |$key|
+        { "Could not find a value for key '${key}', please configure it in your hiera data" }
+
     $ntp_conf_default  = 'server time.apple.com'
     $ntp_conf_template = inline_template("<%= (@servers.collect {
       |x| ['server', x].join('\s') }).join('\n') %>")

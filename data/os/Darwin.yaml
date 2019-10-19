@@ -1,0 +1,4 @@
+---
+
+managedmac::ntp::service:                          'com.apple.timed'
+managedmac::softwareupdate::autoupdate_plist_path: '/Library/Preferences/com.apple.commerce.plist'

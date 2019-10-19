@@ -1,7 +1,7 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'managedmac', 'common'))
 
 Puppet::Type.newtype(:property_list) do
-  desc %q{Puppet type for managing OS X PropertyLists.
+  desc "Puppet type for managing OS X PropertyLists.
 
     Suitable for the creation and management of configuration files and
     OS X preference domain stores.
@@ -62,22 +62,22 @@ Puppet::Type.newtype(:property_list) do
         content  => $content,
         provider => defaults,
       }
-  }
+  "
 
   ensurable
 
   newparam(:path) do
-    desc %q{The path to the file to manage. Must be fully qualified.}
+    desc 'The path to the file to manage. Must be fully qualified.'
     isnamevar
 
     validate do |value|
       unless Puppet::Util.absolute_path?(value)
-        fail Puppet::Error, "File paths must be fully qualified, not '#{value}'"
+        raise Puppet::Error, "File paths must be fully qualified, not '#{value}'"
       end
     end
 
     munge do |value|
-      if value.start_with?('//') and ::File.basename(value) == "/"
+      if value.start_with?('//') && ::File.basename(value) == '/'
         # This is a UNC path pointing to a share, so don't add a trailing slash
         ::File.expand_path(value)
       else
@@ -87,30 +87,30 @@ Puppet::Type.newtype(:property_list) do
   end
 
   newproperty(:owner) do
-    desc %q{The user to whom the file should belong. Argument should be a user
+    desc 'The user to whom the file should belong. Argument should be a user
       name. Default is root.
 
       NOTE: The user name is NOT pre-validated.
-    }
+    '
     defaultto 'root'
   end
 
   newproperty(:group) do
-    desc %q{Which group that should own the file. Argument should be a group
+    desc 'Which group that should own the file. Argument should be a group
       name. Default is wheel.
 
       NOTE: The group name is NOT pre-validated.
-    }
+    '
     defaultto 'wheel'
   end
 
   newproperty(:mode) do
-    desc %q{The desired permissions for the file using standard four-digit
+    desc 'The desired permissions for the file using standard four-digit
       octal notation.
-    }
+    '
 
     validate do |value|
-      unless value =~ /\A\d{4}\z/
+      unless value =~ %r{\A\d{4}\z}
         raise Puppet::Error, "Invalid Parameter: \'#{value}\'"
       end
     end
@@ -122,8 +122,8 @@ Puppet::Type.newtype(:property_list) do
     defaultto '0644'
   end
 
-  newproperty(:content, :array_matching => :all) do
-    desc %q{The file's content, whole or in part as a Puppet data type.
+  newproperty(:content, array_matching: :all) do
+    desc "The file's content, whole or in part as a Puppet data type.
 
       Plist content can be managed in whole or in part. Default mode is
       wholesale management -- see the :method documentation for exhaustive
@@ -142,7 +142,7 @@ Puppet::Type.newtype(:property_list) do
           method  => insert,
           content => $content,
         }
-    }
+    "
 
     def insync?(is)
       is = [is].flatten
@@ -151,25 +151,25 @@ Puppet::Type.newtype(:property_list) do
       if resource[:provider] == :defaults
         unless should.first.respond_to?(:keys)
           raise Puppet::Error,
-            "Content type must be Hash when using the :defaults provider!"
+                'Content type must be Hash when using the :defaults provider!'
         end
       end
 
       return is.eql? should if resource[:method] == :replace
 
-      result = should.zip(is).collect do |s,i|
-        if s.nil? or i.nil?
+      result = should.zip(is).map do |s, i|
+        if s.nil? || i.nil?
           false
         else
           case s
           when Hash
-            (i.merge(s)).eql? i
+            i.merge(s).eql? i
           when Array
             (i | s).eql? i
-          when String, Fixnum, Float, TrueClass, FalseClass
+          when String, Integer, Float, TrueClass, FalseClass
             i.eql? s
           else
-            fail Puppet::Error, "No equality test for '#{s.class}: (#{s})'"
+            raise Puppet::Error, "No equality test for '#{s.class}: (#{s})'"
           end
         end
       end
@@ -178,14 +178,14 @@ Puppet::Type.newtype(:property_list) do
 
     # Normalize the :content value
     munge do |value|
-      ::ManagedMacCommon::destringify value
+      ::ManagedMacCommon.destringify value
     end
 
     def is_to_s(value)
       value.hash
     end
 
-    alias should_to_s is_to_s
+    alias_method :should_to_s, :is_to_s
 
     validate do |value|
       err = 'Content parameter cannot be'
@@ -199,7 +199,7 @@ Puppet::Type.newtype(:property_list) do
   end
 
   newproperty(:format) do
-    desc %q{The PropertyList format the file should use, binary (default) or
+    desc 'The PropertyList format the file should use, binary (default) or
       xml.
 
       CAUTION: Setting this parameter can cause undue resource modification
@@ -207,7 +207,7 @@ Puppet::Type.newtype(:property_list) do
       selected format differs from what OS X expects it to be, you could get
       annoying conversion cycles.
 
-    }
+    '
     newvalues(:xml, :binary)
     defaultto :binary
   end
@@ -452,5 +452,4 @@ Puppet::Type.newtype(:property_list) do
     newvalues(:replace, :insert)
     defaultto :replace
   end
-
 end

@@ -31,6 +31,7 @@
 # ---
 # managedmac::users::defaults:
 #
+# lint:ignore:140chars
 # managedmac::users::accounts:
 #   foo:
 #     uid: 505
@@ -42,6 +43,7 @@
 #     iterations: 32786
 #     password: a85ea7ce2df74b13be298d6584edbb35558b74616a70e579252416a6b76d0a615c88b7d566280fa5e035e8db7b1a0c4e3ee4b8cd6204652dcb6c89e6e450a60ca7ed0cc9fa545326ca25211e6f600835f50642ab9d407fa30999c68c05b92d9281eff4a66c67f44ed2f8b8eaf8b62283db202bc98e21c0df9a95cf9abb359b69
 #     salt: 9ab79307a7bfbb293b4f015ae748d227423481bcd4e5801f450697d15fb67144
+# lint:endignore
 #
 # Then simply, create a manifest and include the class...
 #
