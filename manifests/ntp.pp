@@ -68,8 +68,10 @@ class managedmac::ntp (
         { "Could not find a value for key '${key}', please configure it in your hiera data" }
 
     $ntp_conf_default  = 'server time.apple.com'
-    $ntp_conf_template = inline_template("<%= (@servers.collect {
-      |x| ['server', x].join('\s') }).join('\n') %>")
+    $template = @(EOF/sn)
+    <%= (@servers.collect {|x| ['server', x].join('\s') }).join('\n') %>
+    | EOF
+    $ntp_conf_template = inline_template($template)
 
     $content = $enable ? {
       true  => $ntp_conf_template,
