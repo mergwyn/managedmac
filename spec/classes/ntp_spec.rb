@@ -66,12 +66,13 @@ describe 'managedmac::ntp' do
         end
 
         specify do
-          is_expected.to contain_file('ntp_conf').that_comes_before("Service[#{service}]")\
-              .with('content' => <<~DOC)
-                                      # This file is managed by Puppet, and is refreshed regularly.
-                                      server time.apple.com
-                                      server time1.google.com
-                                    DOC
+          is_expected.to contain_file('ntp_conf').that_comes_before("Service[#{service}]").with(
+            'content' => <<-DOC.gsub(%r{^\s+}, '')
+                              # This file is managed by Puppet, and is refreshed regularly.
+                              server time.apple.com
+                              server time1.google.com
+                            DOC
+          )
         end
         specify do
           is_expected.to contain_service(service).that_requires('File[ntp_conf]')\
