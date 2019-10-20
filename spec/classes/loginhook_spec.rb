@@ -24,6 +24,8 @@ describe 'managedmac::loginhook', type: 'class' do
             { enable: true, scripts: the_scripts }
           end
 
+          it { is_expected.to contain_file(the_scripts) }
+
           it {
             is_expected.to contain_managedmac__hook('login').with(
               'enable'  => true,
