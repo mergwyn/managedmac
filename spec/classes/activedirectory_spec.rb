@@ -4,57 +4,34 @@ describe 'managedmac::activedirectory', type: 'class' do
   on_supported_os.each do |os, facts|
     context "on #{os}" do
       let(:facts) { facts }
+      let(:default_params) do
+        {
+          hostname: 'foo.ad.com',
+          username: 'account',
+          password: 'password',
+        }
+      end
 
-      context 'when $enable == undef' do
-        it { is_expected.to compile.with_all_deps }
+      context 'with no params set' do
+        it {
+          is_expected.to compile.and_raise_error(%r{expects a value for parameter})
+        }
       end
 
       context 'when $enable == false' do
         context 'when $provider is INVALID' do
           let(:params) do
-            { enable: false, provider: 'whatever' }
+            default_params.merge(enable: false, provider: 'whatever')
           end
 
           it {
-            is_expected.to raise_error(Puppet::Error, %r{Parameter :provider must be 'mobileconfig' or 'dsconfigad'})
+            is_expected.to raise_error(Puppet::PreformattedError, %r{Parameter :provider must be 'dsconfigad'})
           }
-        end
-
-        context 'when $provider == :mobileconfig' do
-          context 'when $evaluate is false' do
-            let(:params) do
-              { enable: false, provider: 'mobileconfig', evaluate: 'false' }
-            end
-
-            specify do
-              is_expected.not_to contain_mobileconfig('managedmac.activedirectory.alacarte')
-            end
-          end
-
-          context "when $evaluate == 'no'" do
-            let(:params) do
-              { enable: false, provider: 'mobileconfig', evaluate: 'no' }
-            end
-
-            specify do
-              is_expected.not_to contain_mobileconfig('managedmac.activedirectory.alacarte')
-            end
-          end
-
-          context 'when $evaluate == true' do
-            let(:params) do
-              { enable: false, provider: 'mobileconfig', evaluate: 'true' }
-            end
-
-            specify do
-              is_expected.to contain_mobileconfig('managedmac.activedirectory.alacarte').with_ensure('absent')
-            end
-          end
         end
 
         context 'when $evaluate is false' do
           let(:params) do
-            { enable: false, provider: 'dsconfigad', evaluate: 'false' }
+            default_params.merge(enable: false, provider: 'dsconfigad', evaluate: 'false')
           end
 
           context 'when $provider == :dsconfigad' do
@@ -65,7 +42,7 @@ describe 'managedmac::activedirectory', type: 'class' do
 
           context "when $evaluate == 'no'" do
             let(:params) do
-              { enable: false, provider: 'dsconfigad', evaluate: 'no' }
+              default_params.merge(enable: false, provider: 'dsconfigad', evaluate: 'no')
             end
 
             specify do
@@ -75,7 +52,7 @@ describe 'managedmac::activedirectory', type: 'class' do
 
           context 'when $evaluate == true' do
             let(:params) do
-              { enable: false, provider: 'dsconfigad', hostname: 'foo.ad.com', evaluate: 'true' }
+              default_params.merge(enable: false, provider: 'dsconfigad', hostname: 'foo.ad.com', evaluate: 'true')
             end
 
             specify do
@@ -86,125 +63,32 @@ describe 'managedmac::activedirectory', type: 'class' do
       end
 
       context 'when $enable == true' do
-        let(:required_params) do
-          {
-            hostname: 'foo.ad.com',
-            username: 'account',
-            password: 'password',
-          }
-        end
-
         context 'when $provider is INVALID' do
           let(:params) do
-            { enable: true, provider: 'whatever' }
+            default_params.merge(enable: true, provider: 'whatever')
           end
 
           it {
-            is_expected.to raise_error(Puppet::Error, %r{Parameter :provider must be 'mobileconfig' or 'dsconfigad'})
-          }
-        end
-
-        context 'when REQUIRED params are NOT set' do
-          let(:params) do
-            { enable: true }
-          end
-
-          it {
-            is_expected.to raise_error(Puppet::Error, %r{You must specify a.*param})
+            is_expected.to raise_error(Puppet::Error, %r{Parameter :provider must be 'dsconfigad'})
           }
         end
 
         context 'when $evaluate is INVALID' do
           let(:params) do
-            { enable: true, evaluate: 'whatever' }
+            default_params.merge(enable: true, evaluate: 'whatever')
           end
 
           it {
-            is_expected.to raise_error(Puppet::Error, %r{Parameter.*must be})
+            is_expected.to raise_error(Puppet::PreformattedError, %r{Evaluation Error: Error while evaluating a Resource Statement})
           }
-        end
-
-        context 'when $provider == :mobileconfig' do
-          let(:required_params) do
-            {
-              enable: true,
-              provider: 'mobileconfig',
-              hostname: 'foo.ad.com',
-              username: 'account',
-              password: 'password',
-            }
-          end
-
-          context 'when REQUIRED params are set' do
-            let(:params) do
-              required_params
-            end
-
-            specify do
-              is_expected.to contain_mobileconfig('managedmac.activedirectory.alacarte').with_ensure('present')
-            end
-          end
-
-          context 'when $evaluate == undef' do
-            let(:params) do
-              required_params.merge(evaluate: :undef)
-            end
-
-            specify do
-              is_expected.to contain_mobileconfig('managedmac.activedirectory.alacarte').with_ensure('present')
-            end
-          end
-
-          context "when $evaluate == 'true'" do
-            let(:params) do
-              required_params.merge(evaluate: 'true')
-            end
-
-            specify do
-              is_expected.to contain_mobileconfig('managedmac.activedirectory.alacarte').with_ensure('present')
-            end
-          end
-
-          context "when $evaluate == 'yes'" do
-            let(:params) do
-              required_params.merge(evaluate: 'yes')
-            end
-
-            specify do
-              is_expected.to contain_mobileconfig('managedmac.activedirectory.alacarte').with_ensure('present')
-            end
-          end
-
-          context "when $evaluate == 'no'" do
-            let(:params) do
-              required_params.merge(evaluate: 'no')
-            end
-
-            specify do
-              is_expected.not_to contain_mobileconfig('managedmac.activedirectory.alacarte')
-            end
-          end
-
-          context "when $evaluate == 'false'" do
-            let(:params) do
-              required_params.merge(evaluate: 'false')
-            end
-
-            specify do
-              is_expected.not_to contain_mobileconfig('managedmac.activedirectory.alacarte')
-            end
-          end
         end
 
         context 'when $provider == :dsconfigad' do
           let(:required_params) do
-            {
+            default_params.merge(
               enable: true,
-              hostname: 'foo.ad.com',
-              username: 'account',
-              password: 'password',
               computer: 'computer',
-            }
+            )
           end
 
           context 'when REQUIRED params are set' do
