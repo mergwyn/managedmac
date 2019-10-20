@@ -54,14 +54,11 @@
 # Copyright 2015 SFU, unless otherwise noted.
 #
 class managedmac::ntp (
-  $enable  = undef,
-  $servers = ['time.apple.com']
+  Optional[Boolean]   $enable  = undef,
+  Array[Stdlib::Fqdn] $servers = ['time.apple.com']
 ) {
 
   unless $enable == undef {
-
-    validate_bool  ($enable)
-    validate_array ($servers)
 
     $ntp_service_label = lookup('managedmac::ntp::service')
       |$key|
@@ -69,7 +66,7 @@ class managedmac::ntp (
 
     $ntp_conf_default  = 'server time.apple.com'
     $template = @(EOF/sn)
-    # This file is maintained by PUPPET - do not modify
+    # This file is managed by Puppet, and is refreshed regularly.
     <%= (@servers.collect {|x| ['server', x].join('\s') }).join('\n') %>
     | EOF
     $ntp_conf_template = inline_template($template)
@@ -99,6 +96,5 @@ class managedmac::ntp (
       enable  => true,
       require => File['ntp_conf'],
     }
-
   }
 }
