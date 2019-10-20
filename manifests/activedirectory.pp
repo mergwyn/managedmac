@@ -250,14 +250,14 @@
 #
 class managedmac::activedirectory (
 
-  String[1] $hostname,
-  String[1] $username,
-  String[1] $password,
-  Boolean $enable                                     = undef,
+  Optional[Boolean] $enable                           = undef,
   String[1] $provider                                 = 'dsconfigad',
   Managedmac::Enable_disable $force                   = 'enable',
   Managedmac::Enable_disable $leave                   = 'disable',
   Optional[Variant[Stdlib::Yes_no,Managedmac::Universalboolean]] $evaluate = undef,
+  Optional[String[1]] $hostname                       = undef,
+  Optional[String[1]] $username                       = undef,
+  Optional[String[1]] $password                       = undef,
   Optional[String[1]] $computer                       = undef,
   Optional[String[1]] $organizational_unit            = undef,
   Optional[Managedmac::Mountstyle] $mount_style       = undef,
@@ -292,6 +292,16 @@ class managedmac::activedirectory (
     unless $provider =~ /\Adsconfigad\z/ {
       fail("Parameter :provider must be \'dsconfigad\', \'mobileconfig\' is depracated. \
 [${provider}]")
+    }
+
+    unless $enable == false {
+
+      if $hostname == undef { fail('You must specify a :hostname param!') }
+
+      if $username == undef { fail('You must specify a :username param!') }
+
+      if $password == undef { fail('You must specify a :password param!') }
+
     }
 
     $ensure = $enable ? {

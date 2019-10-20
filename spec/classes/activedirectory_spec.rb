@@ -12,16 +12,14 @@ describe 'managedmac::activedirectory', type: 'class' do
         }
       end
 
-      context 'with no params set' do
-        it {
-          is_expected.to compile.and_raise_error(%r{expects a value for parameter})
-        }
+      context 'when $enable == undef' do
+        it { is_expected.to compile.with_all_deps }
       end
 
       context 'when $enable == false' do
         context 'when $provider is INVALID' do
           let(:params) do
-            default_params.merge(enable: false, provider: 'whatever')
+            { enable: false, provider: 'whatever' }
           end
 
           it {
@@ -29,9 +27,57 @@ describe 'managedmac::activedirectory', type: 'class' do
           }
         end
 
+        context 'when $provider == :dsconfigad' do
+          specify do
+            is_expected.not_to contain_dsconfigad('foo.ad.com')
+          end
+        end
+
+        context "when $evaluate == 'no'" do
+          let(:params) do
+            { enable: false, provider: 'dsconfigad', evaluate: 'no' }
+          end
+
+          specify do
+            is_expected.not_to contain_dsconfigad('foo.ad.com')
+          end
+        end
+
+        context 'when $evaluate == true' do
+          let(:params) do
+            { enable: false, provider: 'dsconfigad', hostname: 'foo.ad.com', evaluate: 'true' }
+          end
+
+          specify do
+            is_expected.to contain_dsconfigad('foo.ad.com').with_ensure('absent')
+          end
+        end
+      end
+
+      context 'when $enable == true' do
+        context 'when $provider is INVALID' do
+          let(:params) do
+            { enable: false, provider: 'whatever' }
+          end
+
+          it {
+            is_expected.to raise_error(Puppet::PreformattedError, %r{Parameter :provider must be 'dsconfigad'})
+          }
+        end
+
+        context 'when REQUIRED params are NOT set' do
+          let(:params) do
+            { enable: true }
+          end
+
+          it {
+            is_expected.to raise_error(Puppet::PreformattedError, %r{You must specify a.*param})
+          }
+        end
+
         context 'when $evaluate is false' do
           let(:params) do
-            default_params.merge(enable: false, provider: 'dsconfigad', evaluate: 'false')
+            { enable: false, provider: 'dsconfigad', evaluate: 'false' }
           end
 
           context 'when $provider == :dsconfigad' do
@@ -42,7 +88,7 @@ describe 'managedmac::activedirectory', type: 'class' do
 
           context "when $evaluate == 'no'" do
             let(:params) do
-              default_params.merge(enable: false, provider: 'dsconfigad', evaluate: 'no')
+              { enable: false, provider: 'dsconfigad', evaluate: 'no' }
             end
 
             specify do
@@ -52,7 +98,7 @@ describe 'managedmac::activedirectory', type: 'class' do
 
           context 'when $evaluate == true' do
             let(:params) do
-              default_params.merge(enable: false, provider: 'dsconfigad', hostname: 'foo.ad.com', evaluate: 'true')
+              default_params.merge(enable: false, provider: 'dsconfigad', evaluate: 'true')
             end
 
             specify do
