@@ -1,35 +1,26 @@
-# == Class: managedmac::energysaver
+# @summary
+#   Leverages the Mobileconfig type and provider to configure Energy Saver
+#   settings for Desktops and Laptops.
 #
-# Leverages the Mobileconfig type and provider to configure Energy Saver
-# settings for Desktops and Laptops.
+# @note
+#   If no parameters are set, removal of the Mobileconfig resource is implicit.
 #
-# If no parameters are set, removal of the Mobileconfig resource is implicit.
-#
-# === Parameters
-#
-# [*desktop*]
+# @param desktop
 #   The settings to apply for Desktop machines. This is a compound parameter
 #   containing the raw keys/values for configuring EnergySaver. The structure
 #   is rather complex. See the examples for complete details.
-#   Type: Hash
 #
-# [*portable*]
+# @param portable
 #   The settings to apply for Laptop machines. This is a compound parameter
 #   containing the raw keys/values for configuring EnergySaver. The structure
 #   is rather complex. See the examples for complete details.
-#   Type: Hash
-#
-# === Variables
-#
-# [*productname*]
-#   Built-in Facter fact: the common name for the machine model (ie. iMac12,2)
 #
 # === Examples
 #
 # This class was designed to be used with Hiera. As such, the best way to pass
 # options is to specify them in your Hiera datadir:
 #
-#  # Example: defaults.yaml
+# @example defaults.yaml
 #  ---
 #  managedmac::energysaver::desktop:
 #     ACPower:
@@ -62,15 +53,10 @@
 #       'System Sleep Timer': 10
 #       'Wake On LAN': true
 #
-# Then simply, create a manifest and include the class...
-#
-#  # Example: my_manifest.pp
+# @example my_manifest.pp
 #  include managedmac::activedirectory
 #
-# If you just wish to test the functionality of this class, you could also do
-# something along these lines:
-#
-# # Create an Desktop settings Hash
+# @example Create an Desktop settings Hash
 # $desktop = {
 #  "ACPower" => {
 #    "Automatic Restart On Power Loss" => true,
@@ -94,7 +80,7 @@
 #   }
 # }
 #
-# # Create an Portable settings Hash
+# @example Create an Portable settings Hash
 # $portable = {
 #   "ACPower" => {
 #     "Automatic Restart On Power Loss" => true,
@@ -112,30 +98,17 @@
 #   }
 # }
 #
-# # Invoke the class with params
+# @example Invoke the class with params
 # class { 'managedmac::energysaver':
 #   desktop => $desktop,
 #   laptop  => $portable,
 # }
 #
-# === Authors
-#
-# Brian Warsing <bcw@sfu.ca>
-#
-# === Copyright
-#
-# Copyright 2015 SFU, unless otherwise noted.
-#
 class managedmac::energysaver (
-
-  $desktop  = {},
-  $portable = {},
+  Hash $desktop  = {},
+  Hash $portable = {},
 
 ) {
-
-  validate_hash ($desktop)
-  validate_hash ($portable)
-
   $params = {
     'com.apple.MCX' => {
       'com.apple.EnergySaver.desktop.ACPower'       => $desktop['ACPower'],

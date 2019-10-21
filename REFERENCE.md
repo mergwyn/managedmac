@@ -10,7 +10,8 @@
 * [`managedmac::cron`](#managedmaccron): Dynamically create Puppet Cron resources using the Puppet built-in
 'create_resources' function.
 * [`managedmac::desktop`](#managedmacdesktop): Leverages the Mobileconfig type to deploy a Desktop Picture profile.
-* [`managedmac::energysaver`](#managedmacenergysaver): == Class: managedmac::energysaver  Leverages the Mobileconfig type and provider to configure Energy Saver settings for Desktops and Laptops. 
+* [`managedmac::energysaver`](#managedmacenergysaver): Leverages the Mobileconfig type and provider to configure Energy Saver
+settings for Desktops and Laptops.
 * [`managedmac::execs`](#managedmacexecs): == Class: managedmac::execs  Dynamically create Puppet Exec resources using the Puppet built-in 'create_resources' function.  We do some vali
 * [`managedmac::files`](#managedmacfiles): == Class: managedmac::files  Dynamically create Puppet File resources using the Puppet built-in 'create_resources' function.  We do some vali
 * [`managedmac::filevault`](#managedmacfilevault): == Class: managedmac::filevault  Leverages the Mobileconfig type to deploy a FileVault 2 profile. It provides only a subset of the options av
@@ -517,79 +518,11 @@ Default value: `undef`
 
 ### managedmac::energysaver
 
-== Class: managedmac::energysaver
-
-Leverages the Mobileconfig type and provider to configure Energy Saver
-settings for Desktops and Laptops.
-
-If no parameters are set, removal of the Mobileconfig resource is implicit.
-
-=== Parameters
-
-[*desktop*]
-  The settings to apply for Desktop machines. This is a compound parameter
-  containing the raw keys/values for configuring EnergySaver. The structure
-  is rather complex. See the examples for complete details.
-  Type: Hash
-
-[*portable*]
-  The settings to apply for Laptop machines. This is a compound parameter
-  containing the raw keys/values for configuring EnergySaver. The structure
-  is rather complex. See the examples for complete details.
-  Type: Hash
-
-=== Variables
-
-[*productname*]
-  Built-in Facter fact: the common name for the machine model (ie. iMac12,2)
-
 === Examples
 
 This class was designed to be used with Hiera. As such, the best way to pass
 options is to specify them in your Hiera datadir:
 
- # Example: defaults.yaml
- ---
- managedmac::energysaver::desktop:
-    ACPower:
-      'Automatic Restart On Power Loss': true
-      'Disk Sleep Timer-boolean': true
-      'Display Sleep Timer': 15
-      'Sleep On Power Button': false
-      'Wake On LAN': true
-      'System Sleep Timer': 30
-    Schedule:
-      RepeatingPowerOff:
-        eventtype: sleep
-        time: 1410
-        weekdays: 127
-      RepeatingPowerOn:
-        eventtype: wakepoweron
-        time: 480
-        weekdays: 127
- managedmac::energysaver::portable:
-    ACPower:
-      'Automatic Restart On Power Loss': true
-      'Disk Sleep Timer-boolean': true
-      'Display Sleep Timer': 15
-      'Wake On LAN': true
-      'System Sleep Timer': 30
-    BatteryPower:
-      'Automatic Restart On Power Loss': false
-      'Disk Sleep Timer-boolean': true
-      'Display Sleep Timer': 5
-      'System Sleep Timer': 10
-      'Wake On LAN': true
-
-Then simply, create a manifest and include the class...
-
- # Example: my_manifest.pp
- include managedmac::activedirectory
-
-If you just wish to test the functionality of this class, you could also do
-something along these lines:
-
-# Create an Desktop settings Hash
 $desktop = {
  "ACPower" => {
    "Automatic Restart On Power Loss" => true,
@@ -613,7 +546,6 @@ $desktop = {
   }
 }
 
-# Create an Portable settings Hash
 $portable = {
   "ACPower" => {
     "Automatic Restart On Power Loss" => true,
@@ -631,19 +563,74 @@ $portable = {
   }
 }
 
-# Invoke the class with params
 class { 'managedmac::energysaver':
   desktop => $desktop,
   laptop  => $portable,
 }
 
-=== Authors
+* **Note** If no parameters are set, removal of the Mobileconfig resource is implicit.
 
-Brian Warsing <bcw@sfu.ca>
+#### Examples
 
-=== Copyright
+##### defaults.yaml
 
-Copyright 2015 SFU, unless otherwise noted.
+```puppet
+---
+managedmac::energysaver::desktop:
+   ACPower:
+     'Automatic Restart On Power Loss': true
+     'Disk Sleep Timer-boolean': true
+     'Display Sleep Timer': 15
+     'Sleep On Power Button': false
+     'Wake On LAN': true
+     'System Sleep Timer': 30
+   Schedule:
+     RepeatingPowerOff:
+       eventtype: sleep
+       time: 1410
+       weekdays: 127
+     RepeatingPowerOn:
+       eventtype: wakepoweron
+       time: 480
+       weekdays: 127
+managedmac::energysaver::portable:
+   ACPower:
+     'Automatic Restart On Power Loss': true
+     'Disk Sleep Timer-boolean': true
+     'Display Sleep Timer': 15
+     'Wake On LAN': true
+     'System Sleep Timer': 30
+   BatteryPower:
+     'Automatic Restart On Power Loss': false
+     'Disk Sleep Timer-boolean': true
+     'Display Sleep Timer': 5
+     'System Sleep Timer': 10
+     'Wake On LAN': true
+```
+
+##### my_manifest.pp
+
+```puppet
+include managedmac::activedirectory
+```
+
+##### Create an Desktop settings Hash
+
+```puppet
+
+```
+
+##### Create an Portable settings Hash
+
+```puppet
+
+```
+
+##### Invoke the class with params
+
+```puppet
+
+```
 
 #### Parameters
 
@@ -651,17 +638,21 @@ The following parameters are available in the `managedmac::energysaver` class.
 
 ##### `desktop`
 
-Data type: `Any`
+Data type: `Hash`
 
-
+The settings to apply for Desktop machines. This is a compound parameter
+containing the raw keys/values for configuring EnergySaver. The structure
+is rather complex. See the examples for complete details.
 
 Default value: {}
 
 ##### `portable`
 
-Data type: `Any`
+Data type: `Hash`
 
-
+The settings to apply for Laptop machines. This is a compound parameter
+containing the raw keys/values for configuring EnergySaver. The structure
+is rather complex. See the examples for complete details.
 
 Default value: {}
 
