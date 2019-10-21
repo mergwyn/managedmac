@@ -12,7 +12,7 @@
 
 We do some validation of data, but the usual caveats apply: garbage in,
 garbage out.
-* [`managedmac::desktop`](#managedmacdesktop): == Class: managedmac::desktop  Leverages the Mobileconfig type to deploy a Desktop Picture profile.  All of the parameter defaults are 'undef
+* [`managedmac::desktop`](#managedmacdesktop): Leverages the Mobileconfig type to deploy a Desktop Picture profile.
 * [`managedmac::energysaver`](#managedmacenergysaver): == Class: managedmac::energysaver  Leverages the Mobileconfig type and provider to configure Energy Saver settings for Desktops and Laptops. 
 * [`managedmac::execs`](#managedmacexecs): == Class: managedmac::execs  Dynamically create Puppet Exec resources using the Puppet built-in 'create_resources' function.  We do some vali
 * [`managedmac::files`](#managedmacfiles): == Class: managedmac::files  Dynamically create Puppet File resources using the Puppet built-in 'create_resources' function.  We do some vali
@@ -482,67 +482,38 @@ Default value: {}
 
 ### managedmac::desktop
 
-== Class: managedmac::desktop
-
-Leverages the Mobileconfig type to deploy a Desktop Picture profile.
-
-All of the parameter defaults are 'undef' so including/containing the class
-is not sufficient for confguration. You must activate the params by giving
-them a value.
-
-Note: Currently there is a bug with this profile setting that does
-not allow users to change the desktop picture regardless of the
-'locked' setting.
-
-=== Parameters
-
-[*override_picture_path*]
-  Set the path of the default desktop picture on OS X.
-  Type: String
-  Default: undef
-
-[*locked*]
-  This locks the value of the desktop picture so that users can
-  select their own picture or not (read Note above).
-  Type: Boolean
-  Default: undef
-
-=== Variables
-
-Not applicable
-
-=== Examples
-
-This class was designed to be used with Hiera. As such, the best way to pass
-options is to specify them in your Hiera datadir:
-
- # Example: defaults.yaml
- ---
- managedmac::desktop::override_picture_path:
-   "/Library/Desktop Pictures/Abstract.jpg"
- managedmac::desktop::locked: true
-
-Then simply, create a manifest and include the class...
-
- # Example: my_manifest.pp
- include managedmac::desktop
-
 If you just wish to test the functionality of this class, you could also do
 something along these lines:
 
- class { 'managedmac::desktop':
-   override_picture_path  => '/Library/Desktop Pictures/Abstract.jpg',
-   locked                 => true,
- }
+* **Note** All of the parameter defaults are 'undef' so including/containing the class
+is not sufficient for confguration. You must activate the params by giving
+them a value.
 
-=== Authors
+#### Examples
 
-Clayton Burlison <clburlison@gmail.com>
-Brian Warsing <bcw@sfu.ca>
+##### defaults.yaml
 
-=== Copyright
+```puppet
+---
+managedmac::desktop::override_picture_path:
+  "/Library/Desktop Pictures/Abstract.jpg"
+managedmac::desktop::locked: true
+```
 
-Copyright 2015 SFU, unless otherwise noted.
+##### my_manifest.pp
+
+```puppet
+include managedmac::desktop
+```
+
+##### simplte configuration
+
+```puppet
+class { 'managedmac::desktop':
+  override_picture_path  => '/Library/Desktop Pictures/Abstract.jpg',
+  locked                 => true,
+}
+```
 
 #### Parameters
 
@@ -552,7 +523,7 @@ The following parameters are available in the `managedmac::desktop` class.
 
 Data type: `Optional[Stdlib::Absolutepath]`
 
-
+Set the path of the default desktop picture on OS X.
 
 Default value: `undef`
 
@@ -560,7 +531,8 @@ Default value: `undef`
 
 Data type: `Optional[Boolean]`
 
-
+This locks the value of the desktop picture so that users can
+select their own picture or not (read Note above).
 
 Default value: `undef`
 
