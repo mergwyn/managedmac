@@ -4,8 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## 0.8.2
 - Fix missing trailing newline ntp.conf and add warning comment
-- Add parameter typing
 - Remove mobileconfig ad provider
+- Add parameter typing
+- Convert to puppet strings
 - TODO
 
 ## 0.8.1

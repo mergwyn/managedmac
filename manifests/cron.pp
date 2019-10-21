@@ -1,60 +1,51 @@
-# == Class: managedmac::cron
+# Class: managedmac::cron
+# @summary
+#   Dynamically create Puppet Cron resources using the Puppet built-in
+#   'create_resources' function.
 #
-# Dynamically create Puppet Cron resources using the Puppet built-in
-# 'create_resources' function.
+#   We do some validation of data, but the usual caveats apply: garbage in,
+#   garbage out.
 #
-# We do some validation of data, but the usual caveats apply: garbage in,
-# garbage out.
-#
-# === Parameters
-#
-# [*jobs*]
+# @param jobs
 #   This is a Hash of Hashes.
 #   The hash should be in the form { title => { parameters } }.
 #   See http://tinyurl.com/7783b9l, and the examples below for details.
-#   Type: Hash
 #
-# [*defaults*]
+# @param defaults
 #   A Hash that defines the default values for the resources created.
 #   See http://tinyurl.com/7783b9l, and the examples below for details.
-#   Type: Hash
 #
-# === Variables
+### Examples
 #
-# Not applicable
+#   This class was designed to be used with Hiera. As such, the best way to pass
+#   options is to specify them in your Hiera datadir:
 #
-# === Examples
-#
-# This class was designed to be used with Hiera. As such, the best way to pass
-# options is to specify them in your Hiera datadir:
-#
-# # Example: defaults.yaml
-# ---
-# managedmac::cron::jobs:
-#  logrotate:
-#    command: '/usr/sbin/logrotate'
-#    user:    'root'
-#    hour:    2
-#    minute:  0
+# @example defaults.yaml
+#     managedmac::cron::jobs:
+#       logrotate:
+#         command: '/usr/sbin/logrotate'
+#         user:    'root'
+#         hour:    2
+#         minute:  0
 #
 # Then simply, create a manifest and include the class...
 #
-#  # Example: my_manifest.pp
-#  include managedmac::cron
+# @example my_manifest.pp
+#     include managedmac::cron
 #
 # If you just wish to test the functionality of this class, you could also do
 # something along these lines:
 #
-#  # Create some Hashes
-#  $defaults = { user => 'root', hour => 2, minute => 0 }
-#  $jobs = {
-#     'logrotate' => { 'command' => '/usr/bin/who > /tmp/who.dump' },
-#  }
-#
-#  class { 'managedmac::cron':
-#    jobs     => $jobs,
-#    defaults => $defaults,
-#  }
+# @example Create some Hashes
+#     $defaults = { user => 'root', hour => 2, minute => 0 }
+#     $jobs = {
+#        'logrotate' => { 'command' => '/usr/bin/who > /tmp/who.dump' },
+#     }
+#   
+#     class { 'managedmac::cron':
+#       jobs     => $jobs,
+#       defaults => $defaults,
+#     }
 #
 # === Authors
 #
@@ -65,18 +56,12 @@
 # Copyright 2015 SFU, unless otherwise noted.
 #
 class managedmac::cron (
-
-  $jobs     = {},
-  $defaults = {},
-
+  Hash[String,Hash] $jobs = {},
+  Hash $defaults          = {},
 ) {
 
   unless empty ($jobs) {
-
-    validate_raw_constructor ($jobs)
-    validate_hash ($defaults)
     create_resources(cron, $jobs, $defaults)
-
   }
 
 }
