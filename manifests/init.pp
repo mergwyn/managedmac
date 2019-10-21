@@ -1,35 +1,10 @@
-# == Class: managedmac
+# @summary
+#   Module initializer.
 #
-# Module initializer.
-#
-# This module only supports OS X 10.9 or greater.
-#
-# === Parameters
-#
-# None
-#
-# === Variables
-#
-# [*osfamily*]
-#   The osfamily must be Darwin. If not, Puppet will fail.
-#
-# [*macosx_productversion_major*]
-#   The macosx_productversion_major must be 10.9 or greate. If not, Puppet
-#   will fail.
-#
-# === Examples
-#
+# @example
 #  include managedmac
 #
 #  class { managedmac: }
-#
-# === Authors
-#
-# Brian Warsing <bcw@sfu.ca>
-#
-# === Copyright
-#
-# Copyright 2015 SFU, unless otherwise noted.
 #
 class managedmac {
 
