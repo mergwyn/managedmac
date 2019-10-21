@@ -58,11 +58,11 @@
 **Data types**
 
 * [`Managedmac::Enabledisable`](#managedmacenabledisable): Enable/Disable data type
-* [`Managedmac::Mountstyle`](#managedmacmountstyle): Either afp or smb
-* [`Managedmac::Namespace`](#managedmacnamespace): Either forest or domain
-* [`Managedmac::Packetencrypt`](#managedmacpacketencrypt): "allow", "disable", "require" or "ssl"
-* [`Managedmac::Packetsign`](#managedmacpacketsign): "allow", "disable" or "require";
-* [`Managedmac::Universalboolean`](#managedmacuniversalboolean): Can take true/false as string or type
+* [`Managedmac::Mountstyle`](#managedmacmountstyle): Mount style for user home directory
+* [`Managedmac::Namespace`](#managedmacnamespace): Allowed namespace for ad
+* [`Managedmac::Packetencrypt`](#managedmacpacketencrypt): Packet encryption type
+* [`Managedmac::Packetsign`](#managedmacpacketsign): Packet signing type
+* [`Managedmac::Universalboolean`](#managedmacuniversalboolean): Universal boolean. Can take true/false as string or type
 
 ## Classes
 
@@ -4945,32 +4945,31 @@ Alias of `Enum['enable', 'disable']`
 
 ### Managedmac::Mountstyle
 
-Mount Style
+Mount style for user home directory
 
 Alias of `Enum['afp', 'smb']`
 
 ### Managedmac::Namespace
 
-Allowed namespace
+Allowed namespace for ad
 
 Alias of `Enum['forest', 'domain']`
 
 ### Managedmac::Packetencrypt
 
-Packet encryption
+Packet encryption type
 
 Alias of `Enum['allow', 'disable', 'require', 'ssl']`
 
 ### Managedmac::Packetsign
 
-Allowed namespace
+Packet signing type
 
 Alias of `Enum['allow', 'disable', 'require']`
 
 ### Managedmac::Universalboolean
 
-Universal boolean
-lint:ignore:quoted_booleans
+Universal boolean. Can take true/false as string or type
 
 Alias of `Variant[Boolean, Enum['true','false']]`
 

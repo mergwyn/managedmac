@@ -1,5 +1,4 @@
-# Allowed namespace
 # @summary
-#   Either forest or domain
+# Allowed namespace for ad
 #
 type Managedmac::Namespace = Enum['forest','domain']

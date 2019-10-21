@@ -1,5 +1,4 @@
-# Allowed namespace
 # @summary
-#   "allow", "disable" or "require";
+#   Packet signing type
 #
 type Managedmac::Packetsign = Enum['allow','disable','require']

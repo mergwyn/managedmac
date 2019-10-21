@@ -1,5 +1,4 @@
-# Packet encryption
 # @summary
-#   "allow", "disable", "require" or "ssl"
+#   Packet encryption type
 #
 type Managedmac::Packetencrypt = Enum['allow','disable','require','ssl']

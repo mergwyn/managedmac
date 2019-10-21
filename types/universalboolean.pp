@@ -1,7 +1,4 @@
-# Universal boolean
 # @summary
-#   Can take true/false as string or type
+#   Universal boolean. Can take true/false as string or type
 #
-# lint:ignore:quoted_booleans
-type Managedmac::Universalboolean = Variant[Boolean,Enum['true','false']]
-# lint:endignore
+type Managedmac::Universalboolean = Variant[Boolean,Enum['true','false']] # lint:ignore:quoted_booleans
