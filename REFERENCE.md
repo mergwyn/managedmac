@@ -518,55 +518,8 @@ Default value: `undef`
 
 ### managedmac::energysaver
 
-=== Examples
-
-This class was designed to be used with Hiera. As such, the best way to pass
-options is to specify them in your Hiera datadir:
-
-$desktop = {
- "ACPower" => {
-   "Automatic Restart On Power Loss" => true,
-   "Disk Sleep Timer-boolean"        => true,
-   "Display Sleep Timer"             => 15,
-   "Sleep On Power Button"           => false,
-   "Wake On LAN"                     => true,
-   "System Sleep Timer"              => 30,
-  },
-  "Schedule" => {
-    "RepeatingPowerOff" => {
-      "eventtype" => "sleep",
-      "time"      => 1410,
-      "weekdays"  => 127
-    },
-    "RepeatingPowerOn" => {
-      "eventtype" => "wakepoweron",
-      "time"      => 480,
-      "weekdays"  => 127
-    }
-  }
-}
-
-$portable = {
-  "ACPower" => {
-    "Automatic Restart On Power Loss" => true,
-    "Disk Sleep Timer-boolean"        => true,
-    "Display Sleep Timer"             => 15,
-    "Wake On LAN"                     => true,
-    "System Sleep Timer"              => 30,
-  },
-  "BatteryPower" => {
-    "Automatic Restart On Power Loss" => false,
-    "Disk Sleep Timer-boolean"        => true,
-    "Display Sleep Timer"             => 5,
-    "System Sleep Timer"              => 10,
-    "Wake On LAN"                     => true
-  }
-}
-
-class { 'managedmac::energysaver':
-  desktop => $desktop,
-  laptop  => $portable,
-}
+Leverages the Mobileconfig type and provider to configure Energy Saver
+settings for Desktops and Laptops.
 
 * **Note** If no parameters are set, removal of the Mobileconfig resource is implicit.
 
@@ -617,19 +570,58 @@ include managedmac::activedirectory
 ##### Create an Desktop settings Hash
 
 ```puppet
-
+$desktop = {
+ "ACPower" => {
+   "Automatic Restart On Power Loss" => true,
+   "Disk Sleep Timer-boolean"        => true,
+   "Display Sleep Timer"             => 15,
+   "Sleep On Power Button"           => false,
+   "Wake On LAN"                     => true,
+   "System Sleep Timer"              => 30,
+  },
+  "Schedule" => {
+    "RepeatingPowerOff" => {
+      "eventtype" => "sleep",
+      "time"      => 1410,
+      "weekdays"  => 127
+    },
+    "RepeatingPowerOn" => {
+      "eventtype" => "wakepoweron",
+      "time"      => 480,
+      "weekdays"  => 127
+    }
+  }
+}
 ```
 
 ##### Create an Portable settings Hash
 
 ```puppet
-
+$portable = {
+  "ACPower" => {
+    "Automatic Restart On Power Loss" => true,
+    "Disk Sleep Timer-boolean"        => true,
+    "Display Sleep Timer"             => 15,
+    "Wake On LAN"                     => true,
+    "System Sleep Timer"              => 30,
+  },
+  "BatteryPower" => {
+    "Automatic Restart On Power Loss" => false,
+    "Disk Sleep Timer-boolean"        => true,
+    "Display Sleep Timer"             => 5,
+    "System Sleep Timer"              => 10,
+    "Wake On LAN"                     => true
+  }
+}
 ```
 
 ##### Invoke the class with params
 
 ```puppet
-
+class { 'managedmac::energysaver':
+  desktop => $desktop,
+  laptop  => $portable,
+}
 ```
 
 #### Parameters
