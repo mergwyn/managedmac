@@ -15,11 +15,6 @@
 #   A Hash that defines the default values for the resources created.
 #   See http://tinyurl.com/7783b9l, and the examples below for details.
 #
-### Examples
-#
-#   This class was designed to be used with Hiera. As such, the best way to pass
-#   options is to specify them in your Hiera datadir:
-#
 # @example defaults.yaml
 #     managedmac::cron::jobs:
 #       logrotate:
@@ -28,13 +23,8 @@
 #         hour:    2
 #         minute:  0
 #
-# Then simply, create a manifest and include the class...
-#
 # @example my_manifest.pp
 #     include managedmac::cron
-#
-# If you just wish to test the functionality of this class, you could also do
-# something along these lines:
 #
 # @example Create some Hashes
 #     $defaults = { user => 'root', hour => 2, minute => 0 }
@@ -46,14 +36,6 @@
 #       jobs     => $jobs,
 #       defaults => $defaults,
 #     }
-#
-# === Authors
-#
-# Brian Warsing <bcw@sfu.ca>
-#
-# === Copyright
-#
-# Copyright 2015 SFU, unless otherwise noted.
 #
 class managedmac::cron (
   Hash[String,Hash] $jobs = {},

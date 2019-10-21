@@ -1,259 +1,170 @@
-# == Class: managedmac::activedirectory
+# @summary
+#   Binds an OS X machine to Active Directory and manages that configuration.
 #
-# Binds an OS X machine to Active Directory and manages that configuration.
+# @note IMPORTANT: USING PROVIDERS
+#   This class now only supprts the `dsconfigad` provider. `mobileconfig` has
+#   been deprecacted.  The `dsconfigad` provider abstracts Apple's
+#   '/usr/sbin/dsconfigad' utility and passes the specified parameters to it.
 #
-# ********* IMPORTANT: USING PROVIDERS *********
+#   As such, the Dsconfigad provider WILL NOT destroy an Active Directory
+#   binding when changing simple AD plugin configuration values.
+#  
+# @note
+#   You *must* specify a $computer parameter when using the Dsconfigad
+#   provider. See https://github.com/dayglojesus/managedmac/issues/72
 #
-# This class can leverage TWO different providers to configure Active
-# Directory binding:
-#
-# ************************************
-# 1. Dsconfigad (default)
-# ************************************
-#
-# This provider abstracts Apple's '/usr/sbin/dsconfigad' utility and passes
-# the specified parameters to it.
-#
-# As such, the Dsconfigad provider WILL NOT destroy an Active Directory
-# binding when changing simple AD plugin configuration values.
-#
-# NOTE: You *must* specify a $computer parameter when using the Dsconfigad
-# provider. See https://github.com/dayglojesus/managedmac/issues/72
-#
-# === Parameters
-#
-# [*enable*]
+# @param enable
 #   Whether to apply the resource or remove it. Pass a Symbol or a String.
-#   Type: Boolean
-#   Default: undef
 #
-# [*evaluate*]
+# @param evaluate
 #   A seatbelt intended to prevent the Active Directory configuration
 #   from being removed or modified. Any administrator defined condition
 #   can serve as the basis for comparison.
 #   Pass: 'yes', 'no', 'true' or 'false'
 #   If 'no' or 'false', the mobileconfig resource is not evaluated and a
 #   warning is produced. Useful in conjunction with a custom Facter fact.
-#   Type: String
-#   Default: undef
 #
-# [*provider*]
-#   String representation of the provider type. Accepts: dsconfigad and
-#   mobileconfig.
-#   Type: String
-#   Default: dsconfigad
+# @param provider
+#   String representation of the provider type. 
 #
-# [*force*]
-#   *** DSCONFIGAD ONLY! ***
+# @param force
 #   Force the process (i.e., join the existing account or remove the
 #   binding. Accepts: enable or disable
-#   Type: String
-#   Default: enable
 #
-# [*leave*]
-#   *** BROKEN! (DSCONFIGAD ONLY!) ***
+# @param leave
+#   *** BROKEN! ***
 #   * Using this feature will procude a Segmentation Fault error in the
 #   * dsconfigad utility. This is an Apple bug. If it were to work it would
 #   * perform the following function...
-#   **************************************
+#   ***
+#   
 #   Leaves the current domain (preserving the computer record in the
-#   directory). Accepts: enable or disable
-#   Type: String
-#   Default: disable
+#   directory). 
 #
-# [*hostname*]
+# @param hostname
 #   The Active Directory domain to join. This parameter is required when
 #   :enabled is true.
-#   Type: String
-#   Default: undef
 #
-# [*username*]
+# @param username
 #   User name of the account used to join the domain. This parameter is
 #   required when :enabled is true.
-#   Type: String
-#   Default: undef
 #
-# [*password*]
+# @param password
 #   Password of the account used to join the domain. This parameter is
 #   required when :enabled is true.
-#   Type: String
-#   Default: undef
 #
-# [*computer*]
-#   *** DSCONFIGAD ONLY! ***
+# @param computer
 #   The "computerid" to add the specified Domain. Required parameter.
-#   Type: String
-#   Default: undef
 #
-# [*organizational_unit*]
+# @param organizational_unit
 #   The organizational unit (OU) where the joining computer object is added
-#   Type: String
-#   Default: undef
 #
-# [*mount_style*]
+# @param mount_style
 #   Network home protocol to use: "afp" or "smb"
-#   Type: String
-#   Default: undef
 #
-# [*sharepoint*]
-#   *** DSCONFIGAD ONLY! ***
+# @param sharepoint
 #   Enable or disable mounting of the network home as a sharepoint.
-#   Accepts: enable or disable
-#   Type: String
-#   Default: undef
 #
-# [*default_user_shell*]
+# @param default_user_shell
 #   Default user shell; e.g. /bin/bash
-#   Type: String
-#   Default: undef
 #
-# [*map_uid_attribute*]
+# @param map_uid_attribute
 #   Map UID to attribute
-#   Type: String
-#   Default: undef
 #
-# [*map_gid_attribute*]
+# @param map_gid_attribute
 #   Map user GID to attribute
-#   Type: String
-#   Default: undef
 #
-# [*map_ggid_attribute*]
+# @param map_ggid_attribute
 #   Map group GID to attribute
-#   Type: String
-#   Default: undef
 #
-# [*authority*]
-#   *** DSCONFIGAD ONLY! ***
+# @param authority
 #   This feature is not described in the man page. Enable or disable
 #   generation of Kerberos authority
-#   Accepts: enable or disable
-#   Type: String
-#   Default: undef
 #
-# [*preferred_dc_server*]
+# @param preferred_dc_server
 #   Prefer this domain server
-#   Type: String
-#   Default: undef
 #
-# [*restrict_ddns*]
+# @param restrict_ddns
 #   Restrict Dynamic DNS updates to the specified interfaces (e.g. en0,
 #   en1, etc)
-#   Type: Array
-#   Default: undef
 #
-# [*namespace*]
+# @param namespace
 #   Set primary user account naming convention: "forest" or "domain";
 #   "domain" is default
-#   Type: String
-#   Default: undef
 #
-# [*domain_admin_group_list*]
+# @param domain_admin_group_list
 #   Allow administration by specified Active Directory groups
-#   Type: Array
-#   Default: undef
 #
-# [*packet_sign*]
+# @param packet_sign
 #   Packet signing: "allow", "disable" or "require"; "allow" is default
-#   Type: String
-#   Default: undef
 #
-# [*packet_encrypt*]
+# @param packet_encrypt
 #   Packet encryption: "allow", "disable", "require" or "ssl"; "allow"
 #   is default
-#   Type: String
-#   Default: undef
 #
-# [*create_mobile_account_at_login*]
+# @param create_mobile_account_at_login
 #   Create mobile account at login
-#   Type: Boolean
-#   Default: undef
 #
-# [*warn_user_before_creating_ma*]
+# @param warn_user_before_creating_ma
 #   Warn user before creating a Mobile Account
-#   Type: Boolean
-#   Default: undef
 #
-# [*force_home_local*]
+# @param force_home_local
 #   Force local home directory
-#   Type: Boolean
-#   Default: undef
 #
-# [*use_windows_unc_path*]
+# @param use_windows_unc_path
 #   Use UNC path from Active Directory to derive network home location
-#   Type: Boolean
-#   Default: undef
 #
-# [*allow_multi_domain_auth*]
+# @param allow_multi_domain_auth
 #   Allow authentication from any domain in the forest
-#   Type: Boolean
-#   Default: undef
 #
-# [*trust_change_pass_interval_days*]
+# @param trust_change_pass_interval_days
 #   How often to require change of the computer trust account password in
 #   days; "0" is disabled
-#   Type: Integer
-#   Default: undef
 #
-# === Variables
-#
-# Not applicable
-#
-# === Examples
-#
-# This class was designed to be used with Hiera. As such, the best way to pass
-# options is to specify them in your Hiera datadir:
-#
-#  # Example: defaults.yaml
-#  ---
-#  managedmac::activedirectory::enable: true
-#  managedmac::activedirectory::provider: dsconfigad
-#  managedmac::activedirectory::hostname: ad.apple.com
-#  managedmac::activedirectory::username: some_account
-#  managedmac::activedirectory::password: some_password
-#  managedmac::activedirectory::computer: some_computer
-#  managedmac::activedirectory::evaluate: "%{::domain_available?}"
-#  managedmac::activedirectory::mount_style: afp
-#  managedmac::activedirectory::create_mobile_account_at_login: true
-#  managedmac::activedirectory::warn_user_before_creating_ma: false
-#  managedmac::activedirectory::force_home_local: true
-#  managedmac::activedirectory::domain_admin_group_list:
-#     - APPLE\Domain Admins
-#     - APPLE\Enterprise Admins
-#  managedmac::activedirectory::trust_change_pass_interval_days: 0
-#
-# Then simply, create a manifest and include the class...
-#
-#  # Example: my_manifest.pp
-#  include managedmac::activedirectory
-#
-# If you just wish to test the functionality of this class, you could also do
-# something along these lines:
-#
-#  class { 'managedmac::activedirectory':
-#     provider                        => 'dsconfigad',
-#     evaluate                        => $::domain_available?,
-#     hostname                        => 'foo.ad.com',
-#     username                        => 'some_account',
-#     password                        => 'some_password',
-#     computer                        => 'some_computer',
-#     mount_style                     => 'afp',
-#     trust_change_pass_interval_days => 0,
-#  }
-#
-# === Authors
-#
-# Brian Warsing <bcw@sfu.ca>
-#
-# === Copyright
-#
-# Copyright 2015 SFU, unless otherwise noted.
+# @example defaults.yaml
+#     ---
+#     managedmac::activedirectory::enable: true
+#     managedmac::activedirectory::provider: dsconfigad
+#     managedmac::activedirectory::hostname: ad.apple.com
+#     managedmac::activedirectory::username: some_account
+#     managedmac::activedirectory::password: some_password
+#     managedmac::activedirectory::computer: some_computer
+#     managedmac::activedirectory::evaluate: "%{::domain_available?}"
+#     managedmac::activedirectory::mount_style: afp
+#     managedmac::activedirectory::create_mobile_account_at_login: true
+#     managedmac::activedirectory::warn_user_before_creating_ma: false
+#     managedmac::activedirectory::force_home_local: true
+#     managedmac::activedirectory::domain_admin_group_list:
+#        - APPLE\Domain Admins
+#        - APPLE\Enterprise Admins
+#     managedmac::activedirectory::trust_change_pass_interval_days: 0
+#   
+#   Then simply, create a manifest and include the class...
+#   
+# @example my_manifest.pp
+#     include managedmac::activedirectory
+#   
+# @example Testing functionality
+#    If you just wish to test the functionality of this class, you could also do
+#    something along these lines:
+#   
+#     class { 'managedmac::activedirectory':
+#        provider                        => 'dsconfigad',
+#        evaluate                        => $::domain_available?,
+#        hostname                        => 'foo.ad.com',
+#        username                        => 'some_account',
+#        password                        => 'some_password',
+#        computer                        => 'some_computer',
+#        mount_style                     => 'afp',
+#        trust_change_pass_interval_days => 0,
+#     }
 #
 class managedmac::activedirectory (
 
   Optional[Boolean] $enable                           = undef,
   String[1] $provider                                 = 'dsconfigad',
-  Managedmac::Enable_disable $force                   = 'enable',
-  Managedmac::Enable_disable $leave                   = 'disable',
+  Managedmac::Enabledisable $force                    = 'enable',
+  Managedmac::Enabledisable $leave                    = 'disable',
   Optional[Variant[Stdlib::Yes_no,Managedmac::Universalboolean]] $evaluate = undef,
   Optional[String[1]] $hostname                       = undef,
   Optional[String[1]] $username                       = undef,
@@ -261,12 +172,12 @@ class managedmac::activedirectory (
   Optional[String[1]] $computer                       = undef,
   Optional[String[1]] $organizational_unit            = undef,
   Optional[Managedmac::Mountstyle] $mount_style       = undef,
-  Optional[Managedmac::Enable_disable] $sharepoint    = undef,
+  Optional[Managedmac::Enabledisable] $sharepoint     = undef,
   Optional[Stdlib::Absolutepath] $default_user_shell  = undef,
   Optional[String[1]] $map_uid_attribute              = undef,
   Optional[String[1]] $map_gid_attribute              = undef,
   Optional[String[1]] $map_ggid_attribute             = undef,
-  Optional[Managedmac::Enable_disable] $authority     = undef,
+  Optional[Managedmac::Enabledisable] $authority      = undef,
   Optional[String[1]] $preferred_dc_server            = undef,
   Optional[Managedmac::Namespace] $namespace          = undef,
   Optional[Array[String,1]] $domain_admin_group_list  = undef,
