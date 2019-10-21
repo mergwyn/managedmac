@@ -5,7 +5,7 @@
 
 **Classes**
 
-* [`managedmac`](#managedmac): == Class: managedmac  Module initializer.  This module only supports OS X 10.9 or greater.  === Parameters  None  === Variables  [*osfamily*]
+* [`managedmac`](#managedmac): Module initializer.
 * [`managedmac::activedirectory`](#managedmacactivedirectory): Binds an OS X machine to Active Directory and manages that configuration.
 * [`managedmac::cron`](#managedmaccron): Dynamically create Puppet Cron resources using the Puppet built-in
 'create_resources' function.
@@ -71,38 +71,17 @@ garbage out.
 
 ### managedmac
 
-== Class: managedmac
-
 Module initializer.
 
-This module only supports OS X 10.9 or greater.
+#### Examples
 
-=== Parameters
+##### 
 
-None
+```puppet
+include managedmac
 
-=== Variables
-
-[*osfamily*]
-  The osfamily must be Darwin. If not, Puppet will fail.
-
-[*macosx_productversion_major*]
-  The macosx_productversion_major must be 10.9 or greate. If not, Puppet
-  will fail.
-
-=== Examples
-
- include managedmac
-
- class { managedmac: }
-
-=== Authors
-
-Brian Warsing <bcw@sfu.ca>
-
-=== Copyright
-
-Copyright 2015 SFU, unless otherwise noted.
+class { managedmac: }
+```
 
 ### managedmac::activedirectory
 
