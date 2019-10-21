@@ -3,6 +3,7 @@
 #   Dynamically create Puppet Cron resources using the Puppet built-in
 #   'create_resources' function.
 #
+# @note
 #   We do some validation of data, but the usual caveats apply: garbage in,
 #   garbage out.
 #

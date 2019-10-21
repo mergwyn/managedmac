@@ -9,9 +9,6 @@
 * [`managedmac::activedirectory`](#managedmacactivedirectory): Binds an OS X machine to Active Directory and manages that configuration.
 * [`managedmac::cron`](#managedmaccron): Dynamically create Puppet Cron resources using the Puppet built-in
 'create_resources' function.
-
-We do some validation of data, but the usual caveats apply: garbage in,
-garbage out.
 * [`managedmac::desktop`](#managedmacdesktop): Leverages the Mobileconfig type to deploy a Desktop Picture profile.
 * [`managedmac::energysaver`](#managedmacenergysaver): == Class: managedmac::energysaver  Leverages the Mobileconfig type and provider to configure Energy Saver settings for Desktops and Laptops. 
 * [`managedmac::execs`](#managedmacexecs): == Class: managedmac::execs  Dynamically create Puppet Exec resources using the Puppet built-in 'create_resources' function.  We do some vali
@@ -402,6 +399,9 @@ Default value: `undef`
 ### managedmac::cron
 
 Class: managedmac::cron
+
+* **Note** We do some validation of data, but the usual caveats apply: garbage in,
+garbage out.
 
 #### Examples
 
