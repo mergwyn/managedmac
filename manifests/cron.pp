@@ -1,4 +1,3 @@
-# Class: managedmac::cron
 # @summary
 #   Dynamically create Puppet Cron resources using the Puppet built-in
 #   'create_resources' function.
