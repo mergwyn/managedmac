@@ -43,8 +43,8 @@
 #     }
 #
 class managedmac::groups (
-  Hash[String,Hash] $accounts = undef,
-  Hash $defaults              = {}
+  Optional[Hash[String,Hash]] $accounts = undef,
+  Hash $defaults                        = {}
 ) {
 
   if is_hash(hiera('managedmac::activedirectory::enable', false)) {

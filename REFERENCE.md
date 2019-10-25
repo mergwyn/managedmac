@@ -959,7 +959,7 @@ The following parameters are available in the `managedmac::groups` class.
 
 ##### `accounts`
 
-Data type: `Hash[String,Hash]`
+Data type: `Optional[Hash[String,Hash]]`
 
 This is a Hash of Hashes.
 The hash should be in the form { title => { parameters } }.
