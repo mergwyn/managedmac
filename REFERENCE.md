@@ -39,7 +39,8 @@ the Apple defaults. Read the documentation.
 
 **Defined types**
 
-* [`managedmac::hook`](#managedmachook): Definition: managedmac::hook  This class installs a master login or logout hook.  Parameters: - $enable Whether to activate the master hook o
+* [`managedmac::hook`](#managedmachook): This class installs a master login or logout hook and tells them where to
+find the child scripts
 
 **Resource types**
 
@@ -3588,25 +3589,19 @@ Default value: {}
 
 ### managedmac::hook
 
-Definition: managedmac::hook
+This class installs a master login or logout hook and tells them where to
+find the child scripts
 
-This class installs a master login or logout hook.
+#### Examples
 
-Parameters:
-- $enable Whether to activate the master hook or not.
-- $scripts An absolute path on the local machine that will store the scripts
-you want executed by the master hook. Optional parameter.
+##### Sample Usage
 
-Actions:
-- Installs a master login or logout hook and tells them where to find the
-child scripts
-
-
-Sample Usage:
+```puppet
 managedmac::hook {'login':
   enable  => $enable,
   scripts => $scripts,
 }
+```
 
 #### Parameters
 
@@ -3614,15 +3609,16 @@ The following parameters are available in the `managedmac::hook` defined type.
 
 ##### `enable`
 
-Data type: `Any`
+Data type: `Boolean`
 
-
+Whether to activate the master hook or not.
 
 ##### `scripts`
 
-Data type: `Any`
+Data type: `Optional[Stdlib::Absolutepath]`
 
-
+An absolute path on the local machine that will store the scripts you want
+executed by the master hook.
 
 ## Resource types
 
