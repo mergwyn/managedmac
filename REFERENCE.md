@@ -19,7 +19,8 @@ settings for Desktops and Laptops.
 * [`managedmac::filevault`](#managedmacfilevault): Leverages the Mobileconfig type to deploy a FileVault 2 profile. It provides
 only a subset of the options available to the profile and does not conform to
 the Apple defaults. Read the documentation.
-* [`managedmac::groups`](#managedmacgroups): == Class: managedmac::groups  Dynamically create Puppet Macgroup resources using the Puppet built-in 'create_resources' function.  We do some
+* [`managedmac::groups`](#managedmacgroups): Dynamically create Puppet Macgroup resources using the Puppet built-in
+'create_resources' function.
 * [`managedmac::loginhook`](#managedmacloginhook): == Class: managedmac::loginhook  Simple class for activating or deactivating OS X loginhooks and specifying a directory of scripts to execute
 * [`managedmac::loginwindow`](#managedmacloginwindow): Then simply, create a manifest and include the class...   # Example: my_manifest.pp  include managedmac::loginwindow  If you just wish to tes
 * [`managedmac::logouthook`](#managedmaclogouthook): == Class: managedmac::logouthook  Simple class for activating or deactivating OS X logouthooks and specifying a directory of scripts to execu
@@ -776,7 +777,9 @@ The following parameters are available in the `managedmac::files` class.
 
 Data type: `Hash[String,Hash]`
 
-
+This is a Hash of Hashes.
+The hash should be in the form { title => { parameters } }.
+See http://tinyurl.com/7783b9l, and the examples below for details.
 
 Default value: {}
 
@@ -784,7 +787,8 @@ Default value: {}
 
 Data type: `Hash`
 
-
+A Hash that defines the default values for the resources created.
+See http://tinyurl.com/7783b9l, and the examples below for details.
 
 Default value: {}
 
@@ -904,59 +908,37 @@ Default value: `undef`
 
 ### managedmac::groups
 
-== Class: managedmac::groups
-
-Dynamically create Puppet Macgroup resources using the Puppet built-in
-'create_resources' function.
-
-We do some validation of data, but the usual caveats apply: garbage in,
-garbage out.
-
-=== Parameters
-
-[*accounts*]
-  This is a Hash of Hashes.
-  The hash should be in the form { title => { parameters } }.
-  See http://tinyurl.com/7783b9l, and the examples below for details.
-  Type: Hash
-
-[*defaults*]
-  A Hash that defines the default values for the resources created.
-  See http://tinyurl.com/7783b9l, and the examples below for details.
-  Type: Hash
-
-=== Variables
-
-Not applicable
-
-=== Examples
-This class was designed to be used with Hiera. As such, the best way to pass
-options is to specify them in your Hiera datadir:
-
-# Example: defaults.yaml
 ---
-managedmac::groups::defaults:
-  ensure: present
-managedmac::groups::accounts:
-  foo_group:
-    gid: 998
-    users:
-      - foo
-      - bar
-  bar_group:
-    gid: 999
-    nestedgroups:
-      - foo_group
+    managedmac::groups::defaults:
+      ensure: present
+    managedmac::groups::accounts:
+      foo_group:
+        gid: 998
+        users:
+          - foo
+          - bar
+      bar_group:
+        gid: 999
+        nestedgroups:
+          - foo_group
 
-Then simply, create a manifest and include the class...
+#### Examples
 
-# Example: my_manifest.pp
+##### defaults.yaml
+
+```puppet
+
+```
+
+##### my_manifest.pp
+
+```puppet
 include managedmac::groups
+```
 
-If you just wish to test the functionality of this class, you could also do
-something along these lines:
+##### Create some hashes
 
-# Create some Hashes
+```puppet
 $defaults = { 'ensure' => 'present', }
 $accounts = {
   'foo_group' => { 'gid' => 511, 'users'        => ['foo'] },
@@ -967,14 +949,7 @@ class { 'managedmac::groups':
   accounts => $accounts,
   defaults => $defaults,
 }
-
-=== Authors
-
-Brian Warsing <bcw@sfu.ca>
-
-=== Copyright
-
-Copyright 2015 SFU, unless otherwise noted.
+```
 
 #### Parameters
 
@@ -982,17 +957,20 @@ The following parameters are available in the `managedmac::groups` class.
 
 ##### `accounts`
 
-Data type: `Any`
+Data type: `Hash[String,Hash]`
 
-
+This is a Hash of Hashes.
+The hash should be in the form { title => { parameters } }.
+See http://tinyurl.com/7783b9l, and the examples below for details.
 
 Default value: `undef`
 
 ##### `defaults`
 
-Data type: `Any`
+Data type: `Hash`
 
-
+A Hash that defines the default values for the resources created.
+See http://tinyurl.com/7783b9l, and the examples below for details.
 
 Default value: {}
 
