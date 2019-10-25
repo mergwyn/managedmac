@@ -16,7 +16,9 @@ settings for Desktops and Laptops.
 'create_resources' function.
 * [`managedmac::files`](#managedmacfiles): Dynamically create Puppet File resources using the Puppet built-in
 'create_resources' function.
-* [`managedmac::filevault`](#managedmacfilevault): == Class: managedmac::filevault  Leverages the Mobileconfig type to deploy a FileVault 2 profile. It provides only a subset of the options av
+* [`managedmac::filevault`](#managedmacfilevault): Leverages the Mobileconfig type to deploy a FileVault 2 profile. It provides
+only a subset of the options available to the profile and does not conform to
+the Apple defaults. Read the documentation.
 * [`managedmac::groups`](#managedmacgroups): == Class: managedmac::groups  Dynamically create Puppet Macgroup resources using the Puppet built-in 'create_resources' function.  We do some
 * [`managedmac::loginhook`](#managedmacloginhook): == Class: managedmac::loginhook  Simple class for activating or deactivating OS X loginhooks and specifying a directory of scripts to execute
 * [`managedmac::loginwindow`](#managedmacloginwindow): Then simply, create a manifest and include the class...   # Example: my_manifest.pp  include managedmac::loginwindow  If you just wish to tes
@@ -788,91 +790,34 @@ Default value: {}
 
 ### managedmac::filevault
 
-== Class: managedmac::filevault
-
 Leverages the Mobileconfig type to deploy a FileVault 2 profile. It provides
 only a subset of the options available to the profile and does not conform to
 the Apple defaults. Read the documentation.
 
-=== Parameters
+#### Examples
 
-[*enable*]
-  --> Whether to enable FileVault or not.
-  Type: Boolean
+##### defaults.yaml
 
-[*use_recovery_key*]
-  Set to true to create a personal recovery key.
-  Type: Boolean
-
-[*show_recovery_key*]
-  Set to true to display the personal recovery key to the user after
-  FileVault is enabled.
-  Type: Boolean
-
-[*output_path*]
-  Path to the location where the recovery key and computer information
-  plist will be stored.
-  Type: String
-
-[*use_keychain*]
-  If set to true and no certificate information is provided in this
-  payload, the keychain already created at
-  /Library/Keychains/FileVaultMaster.keychain will be used when the
-  institutional recovery key is added.
-  Type: Boolean
-
-[*keychain_file*]
-  An absolute path or puppet:/// style URI from whence to gather an FVMI.
-  It will install and manage /Library/Keychains/FileVaultMaster.keychain.
-  Only works when $use_keychain is true.
-  Type: String
-
-[*destroy_fv_key_on_standby*]
-  Prevent saving the key across standby modes.
-  Type: Boolean
-
-[*dont_allow_fde_disable*]
-  Prevent users from disabling FDE.
-  Type: Boolean
-
-[*remove_fde*]
-  Removes FDE if $enable is false and the disk is encrypted.
-  Type: Boolean
-
-=== Variables
-
-Not applicable
-
-=== Examples
-
-This class was designed to be used with Hiera. As such, the best way to pass
-options is to specify them in your Hiera datadir:
-
- # Example: defaults.yaml
- ---
+```puppet
+---
 managedmac::filevault::enable: true
 managedmac::filevault::use_recovery_key: true
 managedmac::filevault::show_recovery_key: true
+```
 
-Then simply, create a manifest and include the class...
+##### my_manifest.pp
 
- # Example: my_manifest.pp
- include managedmac::filevault
+```puppet
+include managedmac::filevault
+```
 
-If you just wish to test the functionality of this class, you could also do
-something along these lines:
+##### Simple test
 
- class { 'managedmac::filevault':
-   enable => true,
- }
-
-=== Authors
-
-Brian Warsing <bcw@sfu.ca>
-
-=== Copyright
-
-Copyright 2015 SFU, unless otherwise noted.
+```puppet
+class { 'managedmac::filevault':
+  enable => true,
+}
+```
 
 #### Parameters
 
@@ -880,73 +825,80 @@ The following parameters are available in the `managedmac::filevault` class.
 
 ##### `enable`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
-
+Whether to enable FileVault or not.
 
 Default value: `undef`
 
 ##### `use_recovery_key`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
-
+Set to true to create a personal recovery key.
 
 Default value: `undef`
 
 ##### `show_recovery_key`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
-
+Set to true to display the personal recovery key to the user after
+FileVault is enabled.
 
 Default value: `undef`
 
 ##### `output_path`
 
-Data type: `Any`
+Data type: `Optional[Stdlib::Absolutepath]`
 
-
+Path to the location where the recovery key and computer information
+plist will be stored.
 
 Default value: `undef`
 
 ##### `use_keychain`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
-
+If set to true and no certificate information is provided in this
+payload, the keychain already created at
+/Library/Keychains/FileVaultMaster.keychain will be used when the
+institutional recovery key is added.
 
 Default value: `undef`
 
 ##### `keychain_file`
 
-Data type: `Any`
+Data type: `Optional[Stdlib::Filesource]`
 
-
+An absolute path or puppet:/// style URI from whence to gather an FVMI.
+It will install and manage /Library/Keychains/FileVaultMaster.keychain.
+Only works when $use_keychain is true.
 
 Default value: `undef`
 
 ##### `destroy_fv_key_on_standby`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
-
+Prevent saving the key across standby modes.
 
 Default value: `undef`
 
 ##### `dont_allow_fde_disable`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
-
+Prevent users from disabling FDE.
 
 Default value: `undef`
 
 ##### `remove_fde`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
-
+Removes FDE if $enable is false and the disk is encrypted.
 
 Default value: `undef`
 
