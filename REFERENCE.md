@@ -909,26 +909,27 @@ Default value: `undef`
 
 ### managedmac::groups
 
----
-    managedmac::groups::defaults:
-      ensure: present
-    managedmac::groups::accounts:
-      foo_group:
-        gid: 998
-        users:
-          - foo
-          - bar
-      bar_group:
-        gid: 999
-        nestedgroups:
-          - foo_group
+Dynamically create Puppet Macgroup resources using the Puppet built-in
+'create_resources' function.
 
 #### Examples
 
 ##### defaults.yaml
 
 ```puppet
-
+---
+managedmac::groups::defaults:
+  ensure: present
+managedmac::groups::accounts:
+  foo_group:
+    gid: 998
+    users:
+      - foo
+      - bar
+  bar_group:
+    gid: 999
+    nestedgroups:
+      - foo_group
 ```
 
 ##### my_manifest.pp

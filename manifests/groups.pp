@@ -10,8 +10,9 @@
 # @param defaults
 #   A Hash that defines the default values for the resources created.
 #   See http://tinyurl.com/7783b9l, and the examples below for details.
+#
 # @example defaults.yaml
-# ---
+#     ---
 #     managedmac::groups::defaults:
 #       ensure: present
 #     managedmac::groups::accounts:
