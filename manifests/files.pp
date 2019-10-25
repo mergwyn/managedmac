@@ -2,12 +2,12 @@
 #   Dynamically create Puppet File resources using the Puppet built-in
 #   'create_resources' function.
 #
-# @params objects
+# @param objects
 #   This is a Hash of Hashes.
 #   The hash should be in the form { title => { parameters } }.
 #   See http://tinyurl.com/7783b9l, and the examples below for details.
 #
-# @params defaults
+# @param defaults
 #   A Hash that defines the default values for the resources created.
 #   See http://tinyurl.com/7783b9l, and the examples below for details.
 #
