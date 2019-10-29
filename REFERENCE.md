@@ -21,9 +21,12 @@ only a subset of the options available to the profile and does not conform to
 the Apple defaults. Read the documentation.
 * [`managedmac::groups`](#managedmacgroups): Dynamically create Puppet Macgroup resources using the Puppet built-in
 'create_resources' function.
-* [`managedmac::loginhook`](#managedmacloginhook): == Class: managedmac::loginhook  Simple class for activating or deactivating OS X loginhooks and specifying a directory of scripts to execute
-* [`managedmac::loginwindow`](#managedmacloginwindow): Then simply, create a manifest and include the class...   # Example: my_manifest.pp  include managedmac::loginwindow  If you just wish to tes
-* [`managedmac::logouthook`](#managedmaclogouthook): == Class: managedmac::logouthook  Simple class for activating or deactivating OS X logouthooks and specifying a directory of scripts to execu
+* [`managedmac::loginhook`](#managedmacloginhook): Simple class for activating or deactivating OS X loginhooks and specifying
+a directory of scripts to execute at login time.
+* [`managedmac::loginwindow`](#managedmacloginwindow): Controls various OS X Loginwindow options spanning multiple preference
+domains and resource types.
+* [`managedmac::logouthook`](#managedmaclogouthook): Simple class for activating or deactivating OS X logouthooks and specifying
+a directory of scripts to execute at login time.
 * [`managedmac::mcx`](#managedmacmcx): == Class: managedmac::mcx  Leverages the Puppet MCX type to deploy some options not available in Configuration Profiles. If any parameters fo
 * [`managedmac::mobileconfigs`](#managedmacmobileconfigs): == Class: managedmac::mobileconfigs  Dynamically create Puppet Mobileconfig resources using the Puppet built-in 'create_resources' function. 
 * [`managedmac::mounts`](#managedmacmounts): == Class: managedmac::mounts  Uses Mobileconfig type to define drives to map at login time.  === Parameters  [*urls*]   A list of network mou
@@ -978,15 +981,13 @@ Default value: {}
 
 ### managedmac::loginhook
 
-== Class: managedmac::loginhook
-
 Simple class for activating or deactivating OS X loginhooks and specifying
 a directory of scripts to execute at login time.
 
-How does it work?
+* **Note** How does it work?
 
 Employs Managedmac::Hook defined type to create a master loginhook.
-  /etc/masterhooks/loginhook.rb
+    /etc/masterhooks/loginhook.rb
 It then activates the hook by setting the LoginHook key in the root
 com.apple.loginwindow preferences domain.
 
@@ -997,59 +998,21 @@ list, executing each file in turn.
 
 The files are executed in alpha-numeric order.
 
-NOTE: While setting enalbe => true will create the script dir if it doesn't
-already exist, setting enable => false will NOT remove directory as it is not
-strictly managed. Removal of orphaned scripts is an excercise left up to the
-administrator.
+#### Examples
 
-We do some validation of data, but the usual caveats apply: garbage in,
-garbage out.
+##### defaults.yaml
 
-=== Parameters
-
-[*enable*]
-  Whether to active the master loginhook or not.
-  Type: Boolean
-
-[*scripts*]
-  An absolute path on the local machine that will store the scripts you want
-  executed by the master loginhook. Optional parameter.
-  Type: String
-
-=== Variables
-
-Not applicable
-
-=== Examples
-
-This class was designed to be used with Hiera. As such, the best way to pass
-options is to specify them in your Hiera datadir:
-
-# Example: defaults.yaml
+```puppet
 ---
 managedmac::loginhook::enable: true
 managedmac::loginhook::scripts: /path/to/your/scripts
+```
 
-Then simply, create a manifest and include the class...
+##### my_manifest.pp
 
- # Example: my_manifest.pp
- include managedmac::loginhook
-
-If you just wish to test the functionality of this class, you could also do
-something along these lines:
-
- class { 'managedmac::loginhook':
-    enable  => true,
-    scripts => '/path/to/your/scripts',
- }
-
-=== Authors
-
-Brian Warsing <bcw@sfu.ca>
-
-=== Copyright
-
-Copyright 2015 SFU, unless otherwise noted.
+```puppet
+include managedmac::loginhook
+```
 
 #### Parameters
 
@@ -1057,43 +1020,85 @@ The following parameters are available in the `managedmac::loginhook` class.
 
 ##### `enable`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
-
+Whether to active the master loginhook or not.
 
 Default value: `undef`
 
 ##### `scripts`
 
-Data type: `Any`
+Data type: `Optional[Stdlib::Absolutepath]`
 
-
+An absolute path on the local machine that will store the scripts you want
+executed by the master loginhook. Optional parameter.
 
 Default value: `undef`
 
 ### managedmac::loginwindow
 
-Then simply, create a manifest and include the class...
+Controls various OS X Loginwindow options spanning multiple preference
+domains and resource types.
 
- # Example: my_manifest.pp
- include managedmac::loginwindow
+* **Note** This is not a full implementation of the available controls. Many
+OpenDirectory related controls were removed becuase they were either no
+longer supported in OS X, cumbersome or out of scope.
 
-If you just wish to test the functionality of this class, you could also do
-something along these lines:
+#### Examples
 
- class { 'managedmac::loginwindow':
-   loginwindow_text => 'Planet Express Employees Only',
-   disable_console_access => true,
-   show_name_and_password_fields => true,
- }
+##### defaults.yaml
 
-=== Authors
+```puppet
+---
+managedmac::loginwindow::users:
+   - fry
+   - bender
+managedmac::loginwindow::groups:
+   - robothouse
+   - 20EFB92F-4842-4218-8973-9F4738963660
+managedmac::loginwindow::allow_list:
+   - D2C2107F-CE19-4C9F-9235-688BEB01D8C0
+   - 779A91D0-885B-4066-97FC-BEECB737E6AF
+managedmac::loginwindow::deny_list:
+   - C3F27BC2-8F89-4D56-9525-95B5133D8F25
+   - F1A496E4-86EB-4387-A4D6-5D6FAD9201E7
+managedmac::loginwindow::disable_console_access: true
+managedmac::loginwindow::enable_external_accounts: false
+managedmac::loginwindow::hide_admin_users: false
+managedmac::loginwindow::hide_local_users: false
+managedmac::loginwindow::hide_mobile_accounts: false
+managedmac::loginwindow::show_network_users: false
+managedmac::loginwindow::allow_local_only_users: true
+managedmac::loginwindow::loginwindow_text: "Some message..."
+managedmac::loginwindow::restart_disabled: false
+managedmac::loginwindow::retries_until_hint: 1000000
+managedmac::loginwindow::show_name_and_password_fields: true
+managedmac::loginwindow::show_other_button: false
+managedmac::loginwindow::shutdown_disabled: false
+managedmac::loginwindow::sleep_disabled: false
+managedmac::loginwindow::disable_autologin: true
+managedmac::loginwindow::disable_guest_account: true
+managedmac::loginwindow::auto_logout_delay: 3600
+managedmac::loginwindow::enable_fast_user_switching: false
+managedmac::loginwindow::disable_fde_autologin: true
+managedmac::loginwindow::adminhostinfo: HostName
+```
 
-Brian Warsing <bcw@sfu.ca>
+##### my_manifest.pp
 
-=== Copyright
+```puppet
+include managedmac::loginwindow
+```
 
-Copyright 2015 SFU, unless otherwise noted.
+##### simple class
+
+```puppet
+class { 'managedmac::loginwindow':
+  loginwindow_text => 'Planet Express Employees Only',
+  disable_console_access => true,
+  show_name_and_password_fields => true,
+}
+```
 
 #### Parameters
 
@@ -1101,215 +1106,243 @@ The following parameters are available in the `managedmac::loginwindow` class.
 
 ##### `users`
 
-Data type: `Any`
+Data type: `Array[String]`
 
-
+A list of user names allowed to access the machine via the loginwindow.
+This control is implemented in the com.apple.access_loginwindow ACL
+group. By default, this group does not exist.
 
 Default value: []
 
 ##### `groups`
 
-Data type: `Any`
+Data type: `Array[String]`
 
-
+A list of groups (names or GUIDs) allowed to access the machine via the
+loginwindow. This control is implemented in the
+com.apple.access_loginwindow ACL group. By default, this group does not
+exist.
 
 Default value: []
 
 ##### `strict`
 
-Data type: `Any`
+Data type: `Boolean`
 
-
+How to handle membership in the users and nestedgroups arrays. Informs the
+provider whether to merge the specified members into the record, or replace
+them outright. See the Macgroup documentation for details.
 
 Default value: `true`
 
-##### `adminhostinfo`
-
-Data type: `Any`
-
-
-
-Default value: `undef`
-
 ##### `allow_list`
 
-Data type: `Any`
+Data type: `Array[String]`
 
-
+A list of GUIDs corresponding to allowed users or groups.
+Corresponds to the AllowList key.
 
 Default value: []
 
 ##### `deny_list`
 
-Data type: `Any`
+Data type: `Array[String]`
 
-
+A list of GUIDs corresponding to denied users or groups.
+Corresponds to the DenyList key.
 
 Default value: []
 
 ##### `disable_console_access`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
-
+Users can access the OS X console by entering the special username:
+'> console'. Setting this to true will disable this feature.
+Corresponds to the DisableConsoleAccess key.
 
 Default value: `undef`
 
 ##### `enable_external_accounts`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
-
+Enable the external accounts feature that allows users to store their home
+directory and account information on a removable disk.
+Corresponds to the EnableExternalAccounts key.
 
 Default value: `undef`
 
 ##### `hide_admin_users`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
-
+Hide administrator accounts when displaying accounts at the loginwindow.
+Corresponds to the HideAdminUsers key.
 
 Default value: `undef`
 
 ##### `hide_local_users`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
-
+Hide local user accounts when displaying accounts at the loginwindow.
+Corresponds to the HideLocalUsers key.
 
 Default value: `undef`
 
 ##### `hide_mobile_accounts`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
-
+Hide mobile user accounts when displaying accounts at the loginwindow.
+Corresponds to the HideMobileAccounts key.
 
 Default value: `undef`
 
 ##### `show_network_users`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
-
+Include network user accounts when displaying accounts at the loginwindow.
+Corresponds to the IncludeNetworkUser key.
 
 Default value: `undef`
 
 ##### `allow_local_only_users`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
-
+Allow local-only account users to login.
+Corresponds to the LocalUserLoginEnabled key.
 
 Default value: `undef`
 
 ##### `loginwindow_text`
 
-Data type: `Any`
+Data type: `Optional[String]`
 
-
+Specifies a message to post on the loginwindow.
+Corresponds to the LoginwindowText key.
 
 Default value: `undef`
 
 ##### `restart_disabled`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
-
+Disable/Remove the Restart button from the loginwindow.
+Corresponds to the RestartDisabled key.
 
 Default value: `undef`
 
 ##### `shutdown_disabled`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
-
+Disable/Remove the Shutdown button from the loginwindow.
+Corresponds to the ShutDownDisabled key.
 
 Default value: `undef`
 
 ##### `sleep_disabled`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
-
+Disable/Remove the Sleep button from the loginwindow.
+Corresponds to the SleepDisabled key.
 
 Default value: `undef`
 
 ##### `retries_until_hint`
 
-Data type: `Any`
+Data type: `Optional[Integer]`
 
-
+The number of failed login attempts a user gets until they are given a
+password hint.
+Corresponds to the RetriesUntilHint key.
 
 Default value: `undef`
 
 ##### `show_name_and_password_fields`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
-
+Use the name and password fields rather than display each account at the
+loginwindow. Setting this to true will override many other related keys.
+Corresponds to the SHOWFULLNAME key.
 
 Default value: `undef`
 
 ##### `show_other_button`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
-
+Show the "Other" button when displaying accounts at the loginwindow.
+Corresponds to the SHOWOTHERUSERS_MANAGED key.
 
 Default value: `undef`
 
 ##### `disable_autologin`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
-
+Disable the use of the OS X autologin feature.
+Corresponds to the com.apple.login.mcx.DisableAutoLoginClient key.
 
 Default value: `undef`
 
 ##### `disable_guest_account`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
-
+Disable the the OS X Guest login feature.
 
 Default value: `undef`
 
 ##### `auto_logout_delay`
 
-Data type: `Any`
+Data type: `Optional[Integer]`
 
-
+Forces a logout after the machine is idle for n seconds.
 
 Default value: `undef`
 
 ##### `enable_fast_user_switching`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
-
+Enable or disable Fast User Switching.
 
 Default value: `undef`
 
 ##### `disable_fde_autologin`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
+Disable autologin after FileVault EFI is unlocked.
 
+Default value: `undef`
+
+##### `adminhostinfo`
+
+Data type: `Optional[String]`
+
+Show System Info, HostName, OS Version and IP Address
+at Login Screen using alt + click on the clock.
+    Suggested Value: HostName
 
 Default value: `undef`
 
 ### managedmac::logouthook
 
-== Class: managedmac::logouthook
-
 Simple class for activating or deactivating OS X logouthooks and specifying
 a directory of scripts to execute at login time.
 
-How does it work?
+* **Note** How does it work?
 
 Employs Managedmac::Hook defined type to create a master logouthook.
-  /etc/masterhooks/logouthook.rb
+    /etc/masterhooks/logouthook.rb
 It then activates the hook by setting the LoginHook key in the root
 com.apple.loginwindow preferences domain.
 
@@ -1320,59 +1353,30 @@ list, executing each file in turn.
 
 The files are executed in alpha-numeric order.
 
-NOTE: While setting enalbe => true will create the script dir if it doesn't
-already exist, setting enable => false will NOT remove directory as it is not
-strictly managed. Removal of orphaned scripts is an excercise left up to the
-administrator.
+#### Examples
 
-We do some validation of data, but the usual caveats apply: garbage in,
-garbage out.
+##### defaults.yaml
 
-=== Parameters
-
-[*enable*]
-  Whether to active the master logouthook or not.
-  Type: Boolean
-
-[*scripts*]
-  An absolute path on the local machine that will store the scripts you want
-  executed by the master logouthook. Optional parameter.
-  Type: String
-
-=== Variables
-
-Not applicable
-
-=== Examples
-
-This class was designed to be used with Hiera. As such, the best way to pass
-options is to specify them in your Hiera datadir:
-
-# Example: defaults.yaml
+```puppet
 ---
 managedmac::logouthook::enable: true
 managedmac::logouthook::scripts: /path/to/your/scripts
+```
 
-Then simply, create a manifest and include the class...
+##### my_manifest.pp
 
- # Example: my_manifest.pp
- include managedmac::logouthook
+```puppet
+include managedmac::logouthook
+```
 
-If you just wish to test the functionality of this class, you could also do
-something along these lines:
+##### Simple class
 
- class { 'managedmac::logouthook':
-    enable  => true,
-    scripts => '/path/to/your/scripts',
- }
-
-=== Authors
-
-Brian Warsing <bcw@sfu.ca>
-
-=== Copyright
-
-Copyright 2015 SFU, unless otherwise noted.
+```puppet
+class { 'managedmac::logouthook':
+   enable  => true,
+   scripts => '/path/to/your/scripts',
+}
+```
 
 #### Parameters
 
@@ -1380,17 +1384,18 @@ The following parameters are available in the `managedmac::logouthook` class.
 
 ##### `enable`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
-
+Whether to active the master logouthook or not.
 
 Default value: `undef`
 
 ##### `scripts`
 
-Data type: `Any`
+Data type: `Optional[Stdlib::Absolutepath]`
 
-
+An absolute path on the local machine that will store the scripts you want
+executed by the master logouthook. Optional parameter.
 
 Default value: `undef`
 

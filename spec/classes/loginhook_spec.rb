@@ -15,7 +15,7 @@ describe 'managedmac::loginhook', type: 'class' do
             { enable: true }
           end
 
-          it { is_expected.to raise_error(Puppet::Error, %r{not an absolute path}) }
+          it { is_expected.to raise_error(Puppet::PreformattedError, %r{Evaluation Error: Error while evaluating a Resource Statement}) }
         end
 
         context 'when scripts is defined' do
