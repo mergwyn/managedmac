@@ -27,7 +27,7 @@ a directory of scripts to execute at login time.
 domains and resource types.
 * [`managedmac::logouthook`](#managedmaclogouthook): Simple class for activating or deactivating OS X logouthooks and specifying
 a directory of scripts to execute at login time.
-* [`managedmac::mcx`](#managedmacmcx): == Class: managedmac::mcx  Leverages the Puppet MCX type to deploy some options not available in Configuration Profiles. If any parameters fo
+* [`managedmac::mcx`](#managedmacmcx): Leverages the Puppet MCX type to deploy some options not available in Configuration Profiles.
 * [`managedmac::mobileconfigs`](#managedmacmobileconfigs): == Class: managedmac::mobileconfigs  Dynamically create Puppet Mobileconfig resources using the Puppet built-in 'create_resources' function. 
 * [`managedmac::mounts`](#managedmacmounts): == Class: managedmac::mounts  Uses Mobileconfig type to define drives to map at login time.  === Parameters  [*urls*]   A list of network mou
 * [`managedmac::ntp`](#managedmacntp): == Class: managedmac::ntp  Activates and configures NTP synchronization.  === Parameters  This class takes a two parameters:  [*enable*]   Wh
@@ -70,9 +70,11 @@ find the child scripts
 * [`Managedmac::Enabledisable`](#managedmacenabledisable): Enable/Disable data type
 * [`Managedmac::Mountstyle`](#managedmacmountstyle): Mount style for user home directory
 * [`Managedmac::Namespace`](#managedmacnamespace): Allowed namespace for ad
+* [`Managedmac::Onoff`](#managedmaconoff): on/off data type
 * [`Managedmac::Packetencrypt`](#managedmacpacketencrypt): Packet encryption type
 * [`Managedmac::Packetsign`](#managedmacpacketsign): Packet signing type
 * [`Managedmac::Universalboolean`](#managedmacuniversalboolean): Universal boolean. Can take true/false as string or type
+* [`Managedmac::Universalonoff`](#managedmacuniversalonoff): Generic on/off/enable/disable/true/false
 
 ## Classes
 
@@ -1401,86 +1403,43 @@ Default value: `undef`
 
 ### managedmac::mcx
 
-== Class: managedmac::mcx
-
 Leverages the Puppet MCX type to deploy some options not available in
-Configuration Profiles. If any parameters for this class are defined...
+Configuration Profiles.
 
-  - Creates a new computer record in the DSLocal node, "mcx_puppet"
-  - Applies the specified settings to the new computer record
+* **Note** If any parameters are defined:
+- Creates a new computer record in the DSLocal node, "mcx_puppet"
+- Applies the specified settings to the new computer record
 
- By itself this class will force a refresh of MCX policy on each Puppet run.
+#### Examples
 
-=== Parameters
+##### defaults.yaml
 
-[*bluetooth*]
-  Enable or disable Bluetooth power and administrative controls.
-  Accepts values: on/off, true/false, enable/disable. Values are enforced, so
-  if you set it to on/true/enable, users will not be able to turn off the
-  service.
-  Type: String or Boolean
+```puppet
+---
+managedmac::mcx::bluetooth: on
+managedmac::mcx::wifi: off
+managedmac::mcx::loginitems:
+   - /Applications/Chess.app
+managedmac::mcx::suppress_icloud_setup: true
+managedmac::mcx::hidden_preference_panes:
+   - com.apple.preferences.icloud
+```
 
-[*wifi*]
-  Enable or disable Airport power and administrative controls.
-  Accepts values: on/off, true/false, enable/disable. Values are enforced, so
-  if you set it to on/true/enable, users will not be able to turn off the
-  service.
-  Type: String or Boolean
+##### my_manifest.pp
 
-[*logintiems*]
-  Accepts a list of items you want launched at login time. Paths are NOT
-  validated.
-  Type: Array
+```puppet
+include managedmac::mcx
+```
 
-[*suppress_icloud_setup*]
-  Suppress iCloud Setup dialogue for new users.
-  Type: Boolean
+##### Basic class
 
-[*hidden_preference_panes*]
-  A list of hidden System Preferences panes. Prefernce pane names MUST be
-  specified by their reverse domain ID. (Eg. com.apple.preferences.icloud)
-  Type: Array
-
-=== Variables
-
-Not applicable
-
-=== Examples
-
-This class was designed to be used with Hiera. As such, the best way to pass
-options is to specify them in your Hiera datadir:
-
- # Example: defaults.yaml
- ---
- managedmac::mcx::bluetooth: on
- managedmac::mcx::wifi: off
- managedmac::mcx::loginitems:
-    - /Applications/Chess.app
- managedmac::mcx::suppress_icloud_setup: true
- managedmac::mcx::hidden_preference_panes:
-    - com.apple.preferences.icloud
-
-Then simply, create a manifest and include the class...
-
- # Example: my_manifest.pp
- include managedmac::mcx
-
-If you just wish to test the functionality of this class, you could also do
-something along these lines:
-
+```puppet
 class { 'managedmac::mcx':
   bluetooth   => on,
   wifi        => off,
   loginitems  => ['/path/to/some/file'],
 }
-
-=== Authors
-
-Brian Warsing <bcw@sfu.ca>
-
-=== Copyright
-
-Copyright 2015 SFU, unless otherwise noted.
+```
 
 #### Parameters
 
@@ -1488,41 +1447,47 @@ The following parameters are available in the `managedmac::mcx` class.
 
 ##### `bluetooth`
 
-Data type: `Optional[Variant[Boolean,Enum['true','on','enable','false','off','disable']]]`
+Data type: `Optional[Managedmac::Universalonoff]`
 
-
+Enable or disable Bluetooth power and administrative controls.
+Accepts values: on/off, true/false, enable/disable. Values are enforced, so
+if you set it to on/true/enable, users will not be able to turn off the
+service.
 
 Default value: `undef`
 
 ##### `wifi`
 
-Data type: `Optional[Variant[Boolean,Enum['true','on','enable','false','off','disable']]]`
+Data type: `Optional[Managedmac::Universalonoff]`
 
-
+Enable or disable Airport power and administrative controls.  Accepts
+values: on/off, true/false, enable/disable. Values are enforced, so if you
+set it to on/true/enable, users will not be able to turn off the service.
 
 Default value: `undef`
 
 ##### `loginitems`
 
-Data type: `Any`
+Data type: `Array[Stdlib::Absolutepath]`
 
-
+Accepts a list of items you want launched at login time.
 
 Default value: []
 
 ##### `suppress_icloud_setup`
 
-Data type: `Any`
+Data type: `Optional[Boolean]`
 
-
+Suppress iCloud Setup dialogue for new users.
 
 Default value: `undef`
 
 ##### `hidden_preference_panes`
 
-Data type: `Any`
+Data type: `Array[Stdlib::Fqdn]`
 
-
+A list of hidden System Preferences panes. Prefernce pane names MUST be
+specified by their reverse domain ID. (Eg. com.apple.preferences.icloud)
 
 Default value: []
 
@@ -4816,6 +4781,12 @@ Allowed namespace for ad
 
 Alias of `Enum['forest', 'domain']`
 
+### Managedmac::Onoff
+
+on/off data type
+
+Alias of `Enum['on', 'off']`
+
 ### Managedmac::Packetencrypt
 
 Packet encryption type
@@ -4833,4 +4804,10 @@ Alias of `Enum['allow', 'disable', 'require']`
 Universal boolean. Can take true/false as string or type
 
 Alias of `Variant[Boolean, Enum['true','false']]`
+
+### Managedmac::Universalonoff
+
+Generic on/off/enable/disable/true/false
+
+Alias of `Variant[Managedmac::Enabledisable, Managedmac::Onoff, Managedmac::Universalboolean]`
 
