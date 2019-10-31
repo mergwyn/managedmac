@@ -18,6 +18,7 @@ Rakefile:
 Gemfile:
   required:
     ':test':
+      - gem: coveralls
       - gem: CFPropertyList
         version: '>=2.2.7'
 .rubocop.yml:
