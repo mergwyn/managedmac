@@ -84,11 +84,11 @@ class managedmac::mcx (
   $organization = hiera('managedmac::organization', 'SFU')
 
   mobileconfig { 'managedmac.mcx.alacarte':
-    ensure            => $ensure,
-    content           => $content,
-    description       => 'Custom MCX Settings',
-    displayname       => 'Managed Mac: Custom MCX',
-    organization      => $organization,
+    ensure       => $ensure,
+    content      => $content,
+    description  => 'Custom MCX Settings',
+    displayname  => 'Managed Mac: Custom MCX',
+    organization => $organization,
     #TODO confirm removal of this value
     #removaldisallowed => false,
   }
