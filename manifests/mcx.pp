@@ -89,7 +89,8 @@ class managedmac::mcx (
     description       => 'Custom MCX Settings',
     displayname       => 'Managed Mac: Custom MCX',
     organization      => $organization,
-    removaldisallowed => false,
+    #TODO confirm removal of this value
+    #removaldisallowed => false,
   }
 
 }
