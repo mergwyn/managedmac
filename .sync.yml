@@ -6,6 +6,7 @@ appveyor.yml:
 .vscode/extensions.json:
   delete: true
 .travis.yml:
+  simplecov: true
   notifications:
     email:
       recipients:
