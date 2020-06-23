@@ -195,7 +195,7 @@ class managedmac::activedirectory (
 
   # If the ntp class is enabled, let's get the time synchronized first
   if hiera('managedmac::ntp::enable', false) {
-    require managedmac::ntp
+    Class['managedmac::ntp'] ~> Class['managedmac::activedirectory']
   }
 
   unless $enable == undef {
