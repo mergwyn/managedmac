@@ -18,28 +18,28 @@ class managedmac {
     fail("unsupported product version: ${::macosx_productversion_major}")
   }
 
-  contain managedmac::ntp
-  contain managedmac::activedirectory
-  contain managedmac::security
-  contain managedmac::desktop
-  contain managedmac::mcx
-  contain managedmac::filevault
-  contain managedmac::loginwindow
-  contain managedmac::softwareupdate
-  contain managedmac::energysaver
-  contain managedmac::portablehomes
-  contain managedmac::mounts
-  contain managedmac::loginhook
-  contain managedmac::logouthook
-  contain managedmac::sshd
-  contain managedmac::remotemanagement
-  contain managedmac::screensharing
-  contain managedmac::mobileconfigs
-  contain managedmac::propertylists
-  contain managedmac::execs
-  contain managedmac::files
-  contain managedmac::users
-  contain managedmac::groups
-  contain managedmac::cron
+  include managedmac::ntp
+  include managedmac::activedirectory
+  include managedmac::security
+  include managedmac::desktop
+  include managedmac::mcx
+  include managedmac::filevault
+  include managedmac::loginwindow
+  include managedmac::softwareupdate
+  include managedmac::energysaver
+  include managedmac::portablehomes
+  include managedmac::mounts
+  include managedmac::loginhook
+  include managedmac::logouthook
+  include managedmac::sshd
+  include managedmac::remotemanagement
+  include managedmac::screensharing
+  include managedmac::mobileconfigs
+  include managedmac::propertylists
+  include managedmac::execs
+  include managedmac::files
+  include managedmac::users
+  include managedmac::groups
+  include managedmac::cron
 
 }
